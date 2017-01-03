@@ -3,7 +3,10 @@ package com.alphasystem.app.sarfengine.ui;
 import com.alphasystem.ApplicationException;
 import com.alphasystem.app.morphologicalengine.docx.MorphologicalChartEngine;
 import com.alphasystem.app.morphologicalengine.util.TemplateReader;
-import com.alphasystem.app.sarfengine.ui.control.*;
+import com.alphasystem.app.sarfengine.ui.control.ChartConfigurationDialog;
+import com.alphasystem.app.sarfengine.ui.control.FileSelectionDialog;
+import com.alphasystem.app.sarfengine.ui.control.RootLettersTableCell;
+import com.alphasystem.app.sarfengine.ui.control.VerbalNounTableCell;
 import com.alphasystem.app.sarfengine.ui.control.model.TabInfo;
 import com.alphasystem.app.sarfengine.ui.control.model.TableModel;
 import com.alphasystem.arabic.model.NamedTemplate;
@@ -564,20 +567,6 @@ public class MorphologicalEnginePane extends BorderPane {
             selectedItem.getVerbalNouns().addAll(event.getNewValue());
         });
 
-        TableColumn<TableModel, ObservableList<NounOfPlaceAndTime>> adverbsColumn = new TableColumn<>();
-        adverbsColumn.setText("Adverbs");
-        adverbsColumn.setPrefWidth(largeColumnWidth);
-        adverbsColumn.setEditable(true);
-        adverbsColumn.setCellValueFactory(new PropertyValueFactory<>("adverbs"));
-        adverbsColumn.setCellFactory(AdverbTableCell::new);
-        adverbsColumn.setOnEditCommit(event -> {
-            makeDirty(true);
-            TableView<TableModel> table = event.getTableView();
-            TableModel selectedItem = table.getSelectionModel().getSelectedItem();
-            selectedItem.getAdverbs().clear();
-            selectedItem.getAdverbs().addAll(event.getNewValue());
-        });
-
         //TODO: figure out how to refresh Verbal Noun column with new values
         templateColumn.setOnEditCommit(event -> {
             makeDirty(true);
@@ -623,7 +612,7 @@ public class MorphologicalEnginePane extends BorderPane {
         skipRuleProcessingColumn.setOnEditCommit(event -> makeDirty(true));
 
         tableView.getColumns().addAll(checkedColumn, rootLettersColumn, templateColumn, verbalNounsColumn,
-                adverbsColumn, removePassiveLineColumn, skipRuleProcessingColumn);
+                removePassiveLineColumn, skipRuleProcessingColumn);
     }
 
     public void setDialogOwner(Stage primaryStage) {
