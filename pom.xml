@@ -34,7 +34,7 @@
                 <activeByDefault>true</activeByDefault>
             </activation>
             <properties>
-                <mainClass>com.alphasystem.app.sarfengine.ui.MorphologicalEngineAppEngineApp</mainClass>
+                <mainClass>com.alphasystem.app.sarfengine.ui.MorphologicalEngineApp</mainClass>
             </properties>
             <build>
                 <plugins>
