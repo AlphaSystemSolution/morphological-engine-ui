@@ -84,7 +84,7 @@ import static org.apache.commons.io.FilenameUtils.getBaseName;
 /**
  * @author sali
  */
-public class MorphologicalEnginePane extends BorderPane {
+class MorphologicalEnginePane extends BorderPane {
 
     private static final double DEFAULT_MIN_HEIGHT = 500.0;
     private static final double ROW_SIZE = 40.0;
@@ -96,7 +96,7 @@ public class MorphologicalEnginePane extends BorderPane {
     private final ChartConfigurationDialog chartConfigurationDialog;
     private final TemplateReader templateReader = TemplateReader.getInstance();
 
-    public MorphologicalEnginePane() {
+    MorphologicalEnginePane() {
         tabPane = new TabPane();
         tabPane.setTabClosingPolicy(SELECTED_TAB);
         tabPane.setBackground(BACKGROUND);
@@ -115,7 +115,7 @@ public class MorphologicalEnginePane extends BorderPane {
     }
 
     private static double calculateTableHeight(int numOfRows) {
-        double height = numOfRows * ROW_SIZE + ROW_SIZE;
+        double height = (numOfRows * ROW_SIZE) + ROW_SIZE;
         height = roundTo100(height);
         return max(height, DEFAULT_MIN_HEIGHT);
     }
@@ -157,7 +157,7 @@ public class MorphologicalEnginePane extends BorderPane {
         tab.setUserData(value);
         tab.setOnCloseRequest(event -> {
             TabInfo tabInfo = getTabUserData();
-            if (tabInfo.getDirty()) {
+            if (tabInfo != null && tabInfo.getDirty()) {
                 Alert alert = new Alert(CONFIRMATION);
                 alert.setContentText("Do you want to save data before closing?");
                 alert.getButtonTypes().setAll(YES, NO, CANCEL);
