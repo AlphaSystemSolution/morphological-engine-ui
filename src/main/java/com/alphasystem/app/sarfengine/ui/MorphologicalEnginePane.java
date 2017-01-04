@@ -479,12 +479,57 @@ class MorphologicalEnginePane extends BorderPane {
         double smallColumnWidth = (boundsWidth * 4) / 100;
 
         // start adding columns
+        TableColumn<TableModel, Boolean> checkedColumn = createCheckedColumn(smallColumnWidth);
+        TableColumn<TableModel, RootLetters> rootLettersColumn = createRootLettersColumn(largeColumnWidth);
+        TableColumn<TableModel, NamedTemplate> templateColumn = createTemplateColumn(largeColumnWidth);
+        TableColumn<TableModel, String> translationColumn = createTranslationColumn(mediumColumnWidth);
+        TableColumn<TableModel, ObservableList<VerbalNoun>> verbalNounsColumn = createVerbalNounsColumn(largeColumnWidth);
+
+        //TODO: figure out how to refresh Verbal Noun column with new values
+        templateColumn.setOnEditCommit(event -> {
+            makeDirty(true);
+            NamedTemplate newValue = event.getNewValue();
+            TableView<TableModel> table = event.getTableView();
+            TableModel selectedItem = table.getSelectionModel().getSelectedItem();
+            selectedItem.setTemplate(newValue);
+
+            // TODO: figure out how to update table
+            List<VerbalNoun> verbalNouns = VerbalNoun.getByTemplate(newValue);
+
+            // clear the currently selected verbal nouns first then add new values, if there is no verbal noun mapped
+            // then our list should be empty
+            selectedItem.getVerbalNouns().clear();
+            if (verbalNouns != null) {
+                selectedItem.getVerbalNouns().addAll(verbalNouns);
+            }
+
+            List<NounOfPlaceAndTime> adverbs = NounOfPlaceAndTime.getByTemplate(newValue);
+
+            // clear the currently selected adverbs first then add new values, if there is no adverb mapped
+            // then our list should be empty
+            selectedItem.getAdverbs().clear();
+            if (adverbs != null) {
+                selectedItem.getAdverbs().addAll(adverbs);
+            }
+        });
+
+        TableColumn<TableModel, Boolean> removePassiveLineColumn = createRemovePassiveLineColumn(mediumColumnWidth);
+        TableColumn<TableModel, Boolean> skipRuleProcessingColumn = createSkipRuleProcessingColumn(mediumColumnWidth);
+
+        tableView.getColumns().addAll(checkedColumn, rootLettersColumn, templateColumn, translationColumn,
+                verbalNounsColumn, removePassiveLineColumn, skipRuleProcessingColumn);
+    }
+
+    private TableColumn<TableModel, Boolean> createCheckedColumn(double smallColumnWidth) {
         TableColumn<TableModel, Boolean> checkedColumn = new TableColumn<>();
         checkedColumn.setPrefWidth(smallColumnWidth);
         checkedColumn.setEditable(true);
         checkedColumn.setCellValueFactory(new PropertyValueFactory<>("checked"));
         checkedColumn.setCellFactory(CheckBoxTableCell.forTableColumn(checkedColumn));
+        return checkedColumn;
+    }
 
+    private TableColumn<TableModel, RootLetters> createRootLettersColumn(double largeColumnWidth) {
         TableColumn<TableModel, RootLetters> rootLettersColumn = new TableColumn<>();
         rootLettersColumn.setText("Root Letters");
         rootLettersColumn.setPrefWidth(largeColumnWidth);
@@ -497,7 +542,10 @@ class MorphologicalEnginePane extends BorderPane {
             TableModel selectedItem = table.getSelectionModel().getSelectedItem();
             selectedItem.setRootLetters(event.getNewValue());
         });
+        return rootLettersColumn;
+    }
 
+    private TableColumn<TableModel, NamedTemplate> createTemplateColumn(double largeColumnWidth) {
         TableColumn<TableModel, NamedTemplate> templateColumn = new TableColumn<>();
         templateColumn.setText("Form");
         templateColumn.setEditable(true);
@@ -551,7 +599,10 @@ class MorphologicalEnginePane extends BorderPane {
                 setGraphic(graphic);
             }
         });
+        return templateColumn;
+    }
 
+    private TableColumn<TableModel, String> createTranslationColumn(double mediumColumnWidth) {
         TableColumn<TableModel, String> translationColumn = new TableColumn<>();
         translationColumn.setText("Translation");
         translationColumn.setPrefWidth(mediumColumnWidth);
@@ -564,7 +615,10 @@ class MorphologicalEnginePane extends BorderPane {
             TableModel selectedItem = table.getSelectionModel().getSelectedItem();
             selectedItem.setTranslation(event.getOldValue());
         });
+        return translationColumn;
+    }
 
+    private TableColumn<TableModel, ObservableList<VerbalNoun>> createVerbalNounsColumn(double largeColumnWidth) {
         TableColumn<TableModel, ObservableList<VerbalNoun>> verbalNounsColumn = new TableColumn<>();
         verbalNounsColumn.setText("Verbal Nouns");
         verbalNounsColumn.setPrefWidth(largeColumnWidth);
@@ -578,35 +632,10 @@ class MorphologicalEnginePane extends BorderPane {
             selectedItem.getVerbalNouns().clear();
             selectedItem.getVerbalNouns().addAll(event.getNewValue());
         });
+        return verbalNounsColumn;
+    }
 
-        //TODO: figure out how to refresh Verbal Noun column with new values
-        templateColumn.setOnEditCommit(event -> {
-            makeDirty(true);
-            NamedTemplate newValue = event.getNewValue();
-            TableView<TableModel> table = event.getTableView();
-            TableModel selectedItem = table.getSelectionModel().getSelectedItem();
-            selectedItem.setTemplate(newValue);
-
-            // TODO: figure out how to update table
-            List<VerbalNoun> verbalNouns = VerbalNoun.getByTemplate(newValue);
-
-            // clear the currently selected verbal nouns first then add new values, if there is no verbal noun mapped
-            // then our list should be empty
-            selectedItem.getVerbalNouns().clear();
-            if (verbalNouns != null) {
-                selectedItem.getVerbalNouns().addAll(verbalNouns);
-            }
-
-            List<NounOfPlaceAndTime> adverbs = NounOfPlaceAndTime.getByTemplate(newValue);
-
-            // clear the currently selected adverbs first then add new values, if there is no adverb mapped
-            // then our list should be empty
-            selectedItem.getAdverbs().clear();
-            if (adverbs != null) {
-                selectedItem.getAdverbs().addAll(adverbs);
-            }
-        });
-
+    private TableColumn<TableModel, Boolean> createRemovePassiveLineColumn(double mediumColumnWidth) {
         TableColumn<TableModel, Boolean> removePassiveLineColumn = new TableColumn<>();
         removePassiveLineColumn.setText("Remove\nPassive\nLine");
         removePassiveLineColumn.setPrefWidth(mediumColumnWidth);
@@ -614,7 +643,10 @@ class MorphologicalEnginePane extends BorderPane {
         removePassiveLineColumn.setCellValueFactory(new PropertyValueFactory<>("removePassiveLine"));
         removePassiveLineColumn.setCellFactory(CheckBoxTableCell.forTableColumn(removePassiveLineColumn));
         removePassiveLineColumn.setOnEditCommit(event -> makeDirty(true));
+        return removePassiveLineColumn;
+    }
 
+    private TableColumn<TableModel, Boolean> createSkipRuleProcessingColumn(double mediumColumnWidth) {
         TableColumn<TableModel, Boolean> skipRuleProcessingColumn = new TableColumn<>();
         skipRuleProcessingColumn.setText("Skip\nRule\nProcessing");
         skipRuleProcessingColumn.setPrefWidth(mediumColumnWidth);
@@ -622,9 +654,7 @@ class MorphologicalEnginePane extends BorderPane {
         skipRuleProcessingColumn.setCellValueFactory(new PropertyValueFactory<>("skipRuleProcessing"));
         skipRuleProcessingColumn.setCellFactory(CheckBoxTableCell.forTableColumn(skipRuleProcessingColumn));
         skipRuleProcessingColumn.setOnEditCommit(event -> makeDirty(true));
-
-        tableView.getColumns().addAll(checkedColumn, rootLettersColumn, templateColumn, translationColumn,
-                verbalNounsColumn, removePassiveLineColumn, skipRuleProcessingColumn);
+        return skipRuleProcessingColumn;
     }
 
     void setDialogOwner(Stage primaryStage) {
