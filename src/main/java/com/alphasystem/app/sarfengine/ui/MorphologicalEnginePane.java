@@ -33,8 +33,10 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ButtonBar.ButtonData;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.ScrollPane;
+import javafx.scene.control.cell.CheckBoxTableCell;
 import javafx.scene.control.cell.ComboBoxTableCell;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
@@ -72,7 +74,6 @@ import static javafx.scene.control.ContentDisplay.GRAPHIC_ONLY;
 import static javafx.scene.control.ScrollPane.ScrollBarPolicy.AS_NEEDED;
 import static javafx.scene.control.SelectionMode.SINGLE;
 import static javafx.scene.control.TabPane.TabClosingPolicy.SELECTED_TAB;
-import static javafx.scene.control.cell.CheckBoxTableCell.forTableColumn;
 import static javafx.scene.input.KeyCode.S;
 import static javafx.scene.input.KeyCombination.ALT_DOWN;
 import static javafx.scene.input.KeyCombination.CONTROL_DOWN;
@@ -473,16 +474,16 @@ public class MorphologicalEnginePane extends BorderPane {
 
     @SuppressWarnings("unchecked")
     private void initializeTable(TableView<TableModel> tableView, double boundsWidth) {
-        double largeColumnWidth = boundsWidth * 20 / 100;
-        double mediumColumnWidth = boundsWidth * 8 / 100;
-        double smallColumnWidth = boundsWidth * 4 / 100;
+        double largeColumnWidth = (boundsWidth * 20) / 100;
+        double mediumColumnWidth = (boundsWidth * 8) / 100;
+        double smallColumnWidth = (boundsWidth * 4) / 100;
 
         // start adding columns
         TableColumn<TableModel, Boolean> checkedColumn = new TableColumn<>();
         checkedColumn.setPrefWidth(smallColumnWidth);
         checkedColumn.setEditable(true);
         checkedColumn.setCellValueFactory(new PropertyValueFactory<>("checked"));
-        checkedColumn.setCellFactory(forTableColumn(checkedColumn));
+        checkedColumn.setCellFactory(CheckBoxTableCell.forTableColumn(checkedColumn));
 
         TableColumn<TableModel, RootLetters> rootLettersColumn = new TableColumn<>();
         rootLettersColumn.setText("Root Letters");
@@ -519,9 +520,7 @@ public class MorphologicalEnginePane extends BorderPane {
                 labelText.setTextAlignment(CENTER);
                 labelText.setFont(ENGLISH_FONT_12);
 
-                comboBox.getSelectionModel().selectedItemProperty().addListener((o, ov, nv) -> {
-                    commitEdit(nv);
-                });
+                comboBox.getSelectionModel().selectedItemProperty().addListener((o, ov, nv) -> commitEdit(nv));
             }
 
             @Override
@@ -551,6 +550,19 @@ public class MorphologicalEnginePane extends BorderPane {
                 }
                 setGraphic(graphic);
             }
+        });
+
+        TableColumn<TableModel, String> translationColumn = new TableColumn<>();
+        translationColumn.setText("Translation");
+        translationColumn.setPrefWidth(mediumColumnWidth);
+        translationColumn.setEditable(true);
+        translationColumn.setCellValueFactory(new PropertyValueFactory<>("translation"));
+        translationColumn.setCellFactory(TextFieldTableCell.forTableColumn());
+        translationColumn.setOnEditCommit(event -> {
+            makeDirty(true);
+            TableView<TableModel> table = event.getTableView();
+            TableModel selectedItem = table.getSelectionModel().getSelectedItem();
+            selectedItem.setTranslation(event.getOldValue());
         });
 
         TableColumn<TableModel, ObservableList<VerbalNoun>> verbalNounsColumn = new TableColumn<>();
@@ -600,7 +612,7 @@ public class MorphologicalEnginePane extends BorderPane {
         removePassiveLineColumn.setPrefWidth(mediumColumnWidth);
         removePassiveLineColumn.setEditable(true);
         removePassiveLineColumn.setCellValueFactory(new PropertyValueFactory<>("removePassiveLine"));
-        removePassiveLineColumn.setCellFactory(forTableColumn(removePassiveLineColumn));
+        removePassiveLineColumn.setCellFactory(CheckBoxTableCell.forTableColumn(removePassiveLineColumn));
         removePassiveLineColumn.setOnEditCommit(event -> makeDirty(true));
 
         TableColumn<TableModel, Boolean> skipRuleProcessingColumn = new TableColumn<>();
@@ -608,15 +620,14 @@ public class MorphologicalEnginePane extends BorderPane {
         skipRuleProcessingColumn.setPrefWidth(mediumColumnWidth);
         skipRuleProcessingColumn.setEditable(true);
         skipRuleProcessingColumn.setCellValueFactory(new PropertyValueFactory<>("skipRuleProcessing"));
-        skipRuleProcessingColumn.setCellFactory(forTableColumn(skipRuleProcessingColumn));
+        skipRuleProcessingColumn.setCellFactory(CheckBoxTableCell.forTableColumn(skipRuleProcessingColumn));
         skipRuleProcessingColumn.setOnEditCommit(event -> makeDirty(true));
 
-        tableView.getColumns().addAll(checkedColumn, rootLettersColumn, templateColumn, verbalNounsColumn,
-                removePassiveLineColumn, skipRuleProcessingColumn);
+        tableView.getColumns().addAll(checkedColumn, rootLettersColumn, templateColumn, translationColumn,
+                verbalNounsColumn, removePassiveLineColumn, skipRuleProcessingColumn);
     }
 
-    public void setDialogOwner(Stage primaryStage) {
-        System.out.println("HERE");
+    void setDialogOwner(Stage primaryStage) {
         Window owner = fileSelectionDialog.getOwner();
         if (owner == null) {
             fileSelectionDialog.initOwner(primaryStage);
