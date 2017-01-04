@@ -24,7 +24,7 @@ public final class Global {
 
     public static Text createLabel(ArabicSupport letter) {
         Text text = new Text();
-        text.setText(letter == null ? "" : letter.getLabel().toUnicode());
+        text.setText(letter == null ? "" : letter.toLabel().toUnicode());
         text.setFont(ARABIC_FONT_24);
         return text;
     }

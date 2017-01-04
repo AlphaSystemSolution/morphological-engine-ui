@@ -545,7 +545,7 @@ public class MorphologicalEnginePane extends BorderPane {
                 Node graphic = null;
                 if (item != null && !empty) {
                     labelText.setText(format("(%s) ", item.getCode()));
-                    arabicText.setText(item.getLabel().toUnicode());
+                    arabicText.setText(item.toLabel().toUnicode());
                     textFlow.getChildren().addAll(arabicText, createSpaceLabel(), labelText);
                     graphic = new Group(textFlow);
                 }
