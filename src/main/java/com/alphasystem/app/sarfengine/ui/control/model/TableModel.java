@@ -80,7 +80,7 @@ public final class TableModel {
 
     private static ConjugationData copy(TableModel src) {
         ConjugationData conjugationData = new ConjugationData();
-        conjugationData.setRootLetters(src.rootLettersProperty().get());
+        conjugationData.setRootLetters(src.getRootLetters());
         return conjugationData;
     }
 
@@ -96,6 +96,10 @@ public final class TableModel {
         this.checked.set(checked);
     }
 
+    public final RootLetters getRootLetters() {
+        return rootLetters.get();
+    }
+
     public final void setRootLetters(RootLetters rootLetters) {
         this.rootLetters.set(rootLetters);
     }
@@ -104,12 +108,20 @@ public final class TableModel {
         return rootLetters;
     }
 
+    public final NamedTemplate getTemplate() {
+        return template.get();
+    }
+
     public final void setTemplate(NamedTemplate template) {
         this.template.set(template);
     }
 
     private ObjectProperty<NamedTemplate> templateProperty() {
         return template;
+    }
+
+    public final String getTranslation() {
+        return translation.get();
     }
 
     public final void setTranslation(String translation) {
@@ -128,12 +140,20 @@ public final class TableModel {
         return adverbs;
     }
 
+    public final boolean isRemovePassiveLine() {
+        return removePassiveLine.get();
+    }
+
     private void setRemovePassiveLine(boolean removePassiveLine) {
         this.removePassiveLine.set(removePassiveLine);
     }
 
     private BooleanProperty removePassiveLineProperty() {
         return removePassiveLine;
+    }
+
+    public final boolean isSkipRuleProcessing() {
+        return skipRuleProcessing.get();
     }
 
     private void setSkipRuleProcessing(boolean skipRuleProcessing) {
