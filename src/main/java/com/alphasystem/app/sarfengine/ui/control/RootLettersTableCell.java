@@ -5,6 +5,7 @@ import com.alphasystem.arabic.model.ArabicLetterType;
 import com.alphasystem.arabic.ui.RootLettersPickerKeyBoard;
 import com.alphasystem.morphologicalanalysis.morphology.model.RootLetters;
 import javafx.geometry.Bounds;
+import javafx.geometry.Pos;
 import javafx.scene.Group;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
@@ -26,6 +27,7 @@ public class RootLettersTableCell extends TableCell<TableModel, RootLetters> {
 
     public RootLettersTableCell(@SuppressWarnings({"unused"}) TableColumn<TableModel, RootLetters> column) {
         setContentDisplay(GRAPHIC_ONLY);
+        setAlignment(Pos.CENTER);
         setNodeOrientation(RIGHT_TO_LEFT);
 
         popup = new Popup();
