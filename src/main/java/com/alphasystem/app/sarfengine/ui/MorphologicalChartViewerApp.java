@@ -44,7 +44,7 @@ public class MorphologicalChartViewerApp extends Application {
         ConjugationData conjugationData = new ConjugationData();
         conjugationData.setTemplate(FORM_I_CATEGORY_I_GROUP_A_TEMPLATE);
         conjugationData.setTranslation("To Mercy");
-        conjugationData.setVerbalNouns(VerbalNoun.VERBAL_NOUN_V1, VerbalNoun.VERBAL_NOUN_V27);
+        conjugationData.addVerbalNouns(VerbalNoun.VERBAL_NOUN_V1, VerbalNoun.VERBAL_NOUN_V27);
         conjugationData.setRootLetters(new RootLetters(ArabicLetterType.RA, ArabicLetterType.HHA, ArabicLetterType.MEEM));
         conjugationTemplate.getData().add(conjugationData);
 
