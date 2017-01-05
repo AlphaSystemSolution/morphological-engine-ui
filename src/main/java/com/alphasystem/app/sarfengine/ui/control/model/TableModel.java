@@ -29,6 +29,7 @@ public final class TableModel {
     private final ObservableList<NounOfPlaceAndTime> adverbs = observableArrayList();
     private final BooleanProperty removePassiveLine = new SimpleBooleanProperty(FALSE, "removePassiveLine");
     private final BooleanProperty skipRuleProcessing = new SimpleBooleanProperty(FALSE, "skipRuleProcessing");
+    private final BooleanProperty viewConjugation = new SimpleBooleanProperty(null, "viewConjugation", FALSE);
     private final ConjugationData conjugationData;
 
     public TableModel() {
@@ -88,12 +89,16 @@ public final class TableModel {
         return conjugationData;
     }
 
-    public final boolean getChecked() {
+    public final boolean isChecked() {
         return checked.get();
     }
 
     public final void setChecked(boolean checked) {
         this.checked.set(checked);
+    }
+
+    public final BooleanProperty checkedProperty() {
+        return checked;
     }
 
     public final RootLetters getRootLetters() {
@@ -148,7 +153,7 @@ public final class TableModel {
         this.removePassiveLine.set(removePassiveLine);
     }
 
-    private BooleanProperty removePassiveLineProperty() {
+    public final BooleanProperty removePassiveLineProperty() {
         return removePassiveLine;
     }
 
@@ -160,8 +165,12 @@ public final class TableModel {
         this.skipRuleProcessing.set(skipRuleProcessing);
     }
 
-    private BooleanProperty skipRuleProcessingProperty() {
+    public final BooleanProperty skipRuleProcessingProperty() {
         return skipRuleProcessing;
+    }
+
+    public final BooleanProperty viewConjugationProperty() {
+        return viewConjugation;
     }
 
 }
