@@ -1,7 +1,9 @@
 package com.alphasystem.app.sarfengine.ui;
 
 import com.alphasystem.ApplicationException;
+import com.alphasystem.app.morphologicalengine.conjugation.model.MorphologicalChart;
 import com.alphasystem.app.morphologicalengine.docx.MorphologicalChartEngine;
+import com.alphasystem.app.morphologicalengine.ui.MorphologicalChartControl;
 import com.alphasystem.app.morphologicalengine.util.TemplateReader;
 import com.alphasystem.app.sarfengine.ui.control.ChartConfigurationDialog;
 import com.alphasystem.app.sarfengine.ui.control.FileSelectionDialog;
@@ -17,6 +19,8 @@ import com.alphasystem.morphologicalanalysis.morphology.model.RootLetters;
 import com.alphasystem.morphologicalanalysis.morphology.model.support.NounOfPlaceAndTime;
 import com.alphasystem.morphologicalanalysis.morphology.model.support.VerbalNoun;
 import de.jensd.fx.glyphs.GlyphIcons;
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.value.ObservableValue;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Service;
 import javafx.concurrent.Task;
@@ -24,6 +28,8 @@ import javafx.concurrent.WorkerStateEvent;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
+import javafx.geometry.Pos;
+import javafx.geometry.Rectangle2D;
 import javafx.scene.Cursor;
 import javafx.scene.Group;
 import javafx.scene.Node;
@@ -45,8 +51,10 @@ import javafx.scene.layout.CornerRadii;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextFlow;
+import javafx.stage.Screen;
 import javafx.stage.Stage;
 import javafx.stage.Window;
+import javafx.util.Callback;
 
 import java.awt.*;
 import java.io.File;
@@ -261,10 +269,10 @@ class MorphologicalEnginePane extends BorderPane {
                 ListIterator<TableModel> listIterator = items.listIterator();
                 while (listIterator.hasNext()) {
                     TableModel model = listIterator.next();
-                    if (model.getChecked()) {
+                    if (model.isChecked()) {
                         listIterator.add(new TableModel(model));
                         model.setChecked(false);
-                    } // end of if "model.getChecked()"
+                    } // end of if "model.isChecked()"
                 } // end of "while"
             } // end of if "items != null && !items.isEmpty()"
         } // end of if "currentTable != null"
@@ -278,7 +286,7 @@ class MorphologicalEnginePane extends BorderPane {
                 ListIterator<TableModel> listIterator = items.listIterator();
                 while (listIterator.hasNext()) {
                     TableModel model = listIterator.next();
-                    if (model.getChecked()) {
+                    if (model.isChecked()) {
                         listIterator.remove();
                     }
                 }
@@ -368,7 +376,7 @@ class MorphologicalEnginePane extends BorderPane {
             final ObservableList<TableModel> currentItems = observableArrayList();
             if (SaveMode.SAVE_SELECTED.equals(saveMode)) {
                 items.forEach(tableModel -> {
-                    if (tableModel.getChecked()) {
+                    if (tableModel.isChecked()) {
                         currentItems.add(tableModel);
                     }
                 });
@@ -515,9 +523,10 @@ class MorphologicalEnginePane extends BorderPane {
 
         TableColumn<TableModel, Boolean> removePassiveLineColumn = createRemovePassiveLineColumn(mediumColumnWidth);
         TableColumn<TableModel, Boolean> skipRuleProcessingColumn = createSkipRuleProcessingColumn(mediumColumnWidth);
+        final TableColumn<TableModel, Boolean> viewConjugationColumn = createViewConjugationColumn(mediumColumnWidth);
 
         tableView.getColumns().addAll(checkedColumn, rootLettersColumn, templateColumn, translationColumn,
-                verbalNounsColumn, removePassiveLineColumn, skipRuleProcessingColumn);
+                verbalNounsColumn, removePassiveLineColumn, skipRuleProcessingColumn, viewConjugationColumn);
     }
 
     private TableColumn<TableModel, Boolean> createCheckedColumn(double smallColumnWidth) {
@@ -525,7 +534,9 @@ class MorphologicalEnginePane extends BorderPane {
         checkedColumn.setPrefWidth(smallColumnWidth);
         checkedColumn.setEditable(true);
         checkedColumn.setCellValueFactory(new PropertyValueFactory<>("checked"));
-        checkedColumn.setCellFactory(CheckBoxTableCell.forTableColumn(checkedColumn));
+        final Callback<Integer, ObservableValue<Boolean>> cb = index ->
+                checkedColumn.getTableView().getItems().get(index).checkedProperty();
+        checkedColumn.setCellFactory(param -> new CheckBoxTableCell<>(cb));
         return checkedColumn;
     }
 
@@ -559,6 +570,7 @@ class MorphologicalEnginePane extends BorderPane {
             {
                 setContentDisplay(GRAPHIC_ONLY);
                 setNodeOrientation(RIGHT_TO_LEFT);
+                setAlignment(Pos.CENTER);
                 comboBox = createComboBox(NamedTemplate.values());
                 arabicText = new Text();
                 arabicText.setFont(ARABIC_FONT_24);
@@ -613,7 +625,7 @@ class MorphologicalEnginePane extends BorderPane {
             makeDirty(true);
             TableView<TableModel> table = event.getTableView();
             TableModel selectedItem = table.getSelectionModel().getSelectedItem();
-            selectedItem.setTranslation(event.getOldValue());
+            selectedItem.setTranslation(event.getNewValue());
         });
         return translationColumn;
     }
@@ -641,7 +653,9 @@ class MorphologicalEnginePane extends BorderPane {
         removePassiveLineColumn.setPrefWidth(mediumColumnWidth);
         removePassiveLineColumn.setEditable(true);
         removePassiveLineColumn.setCellValueFactory(new PropertyValueFactory<>("removePassiveLine"));
-        removePassiveLineColumn.setCellFactory(CheckBoxTableCell.forTableColumn(removePassiveLineColumn));
+        final Callback<Integer, ObservableValue<Boolean>> cb = index ->
+                removePassiveLineColumn.getTableView().getItems().get(index).removePassiveLineProperty();
+        removePassiveLineColumn.setCellFactory(param -> new CheckBoxTableCell<>(cb));
         removePassiveLineColumn.setOnEditCommit(event -> makeDirty(true));
         return removePassiveLineColumn;
     }
@@ -652,9 +666,74 @@ class MorphologicalEnginePane extends BorderPane {
         skipRuleProcessingColumn.setPrefWidth(mediumColumnWidth);
         skipRuleProcessingColumn.setEditable(true);
         skipRuleProcessingColumn.setCellValueFactory(new PropertyValueFactory<>("skipRuleProcessing"));
-        skipRuleProcessingColumn.setCellFactory(CheckBoxTableCell.forTableColumn(skipRuleProcessingColumn));
-        skipRuleProcessingColumn.setOnEditCommit(event -> makeDirty(true));
+        final Callback<Integer, ObservableValue<Boolean>> cb = index ->
+                skipRuleProcessingColumn.getTableView().getItems().get(index).skipRuleProcessingProperty();
+        skipRuleProcessingColumn.setCellFactory(param -> new CheckBoxTableCell<>(cb));
         return skipRuleProcessingColumn;
+    }
+
+    private TableColumn<TableModel, Boolean> createViewConjugationColumn(double width) {
+        final TableColumn<TableModel, Boolean> column = new TableColumn<>();
+        column.setText("View\nConjugation");
+        column.setPrefWidth(width);
+        column.setEditable(true);
+        column.setCellValueFactory(new PropertyValueFactory<>("viewConjugation"));
+        final Callback<Integer, ObservableValue<Boolean>> cb = index -> {
+            final TableModel tableModel = column.getTableView().getItems().get(index);
+            final BooleanProperty viewConjugationProperty = tableModel.viewConjugationProperty();
+            if (viewConjugationProperty.get()) {
+                final RootLetters rootLetters = tableModel.getRootLetters();
+                final NamedTemplate template = tableModel.getTemplate();
+                if (rootLetters == null || template == null) {
+                    Alert alert = new Alert(Alert.AlertType.INFORMATION);
+                    alert.setContentText("Both RootLetters and Form has to populated.");
+                    alert.show();
+                    viewConjugationProperty.setValue(false);
+                } else {
+                    runLater(() -> openViewer(tableModel));
+                    viewConjugationProperty.setValue(false);
+                }
+            }
+            return viewConjugationProperty;
+        };
+        column.setCellFactory(param -> new CheckBoxTableCell<>(cb));
+        return column;
+    }
+
+    private void openViewer(TableModel tableModel) {
+        ConjugationTemplate conjugationTemplate = new ConjugationTemplate();
+        conjugationTemplate.getData().add(tableModel.getConjugationData());
+
+        MorphologicalChartEngine engine = new MorphologicalChartEngine(conjugationTemplate);
+        final MorphologicalChart morphologicalChart = engine.createMorphologicalCharts().get(0);
+        openViewer(morphologicalChart);
+    }
+
+    private void openViewer(MorphologicalChart morphologicalChart) {
+        Stage primaryStage = new Stage();
+        primaryStage.setTitle("Morphological Chart Viewer");
+        Screen screen = Screen.getPrimary();
+        Rectangle2D bounds = screen.getVisualBounds();
+
+        primaryStage.setX(bounds.getMinX());
+        primaryStage.setY(bounds.getMinY());
+        primaryStage.setWidth(bounds.getWidth());
+        primaryStage.setHeight(bounds.getHeight());
+
+        primaryStage.setWidth(bounds.getWidth() / 4);
+        primaryStage.setHeight(bounds.getHeight() / 4);
+
+        MorphologicalChartControl morphologicalChartControl = new MorphologicalChartControl();
+        morphologicalChartControl.setMorphologicalChart(morphologicalChart);
+
+        ScrollPane scrollPane = new ScrollPane();
+        scrollPane.setContent(morphologicalChartControl);
+        scrollPane.setVbarPolicy(AS_NEEDED);
+        scrollPane.setHbarPolicy(AS_NEEDED);
+        Scene scene = new Scene(scrollPane);
+        primaryStage.setMaximized(true);
+        primaryStage.setScene(scene);
+        primaryStage.show();
     }
 
     void setDialogOwner(Stage primaryStage) {
