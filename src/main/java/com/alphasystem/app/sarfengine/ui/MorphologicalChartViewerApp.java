@@ -2,7 +2,7 @@ package com.alphasystem.app.sarfengine.ui;
 
 import com.alphasystem.app.morphologicalengine.conjugation.model.MorphologicalChart;
 import com.alphasystem.app.morphologicalengine.docx.MorphologicalChartEngine;
-import com.alphasystem.app.morphologicalengine.ui.MorphologicalChartControl;
+import com.alphasystem.app.sarfengine.ui.control.MorphologicalChartViewerControl;
 import com.alphasystem.arabic.model.ArabicLetterType;
 import com.alphasystem.morphologicalanalysis.morphology.model.ConjugationData;
 import com.alphasystem.morphologicalanalysis.morphology.model.ConjugationTemplate;
@@ -11,12 +11,10 @@ import com.alphasystem.morphologicalanalysis.morphology.model.support.VerbalNoun
 import javafx.application.Application;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.Scene;
-import javafx.scene.control.ScrollPane;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
 
 import static com.alphasystem.arabic.model.NamedTemplate.FORM_I_CATEGORY_I_GROUP_A_TEMPLATE;
-import static javafx.scene.control.ScrollPane.ScrollBarPolicy.AS_NEEDED;
 
 /**
  * @author sali
@@ -51,14 +49,10 @@ public class MorphologicalChartViewerApp extends Application {
         MorphologicalChartEngine engine = new MorphologicalChartEngine(conjugationTemplate);
         final MorphologicalChart morphologicalChart = engine.createMorphologicalCharts().get(0);
 
-        MorphologicalChartControl morphologicalChartControl = new MorphologicalChartControl();
-        morphologicalChartControl.setMorphologicalChart(morphologicalChart);
+        MorphologicalChartViewerControl morphologicalChartViewer = new MorphologicalChartViewerControl();
+        morphologicalChartViewer.setMorphologicalChart(morphologicalChart);
 
-        ScrollPane scrollPane = new ScrollPane();
-        scrollPane.setContent(morphologicalChartControl);
-        scrollPane.setVbarPolicy(AS_NEEDED);
-        scrollPane.setHbarPolicy(AS_NEEDED);
-        Scene scene = new Scene(scrollPane);
+        Scene scene = new Scene(morphologicalChartViewer);
         primaryStage.setMaximized(true);
         primaryStage.setScene(scene);
         primaryStage.show();
