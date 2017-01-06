@@ -4,7 +4,6 @@ import com.alphasystem.arabic.model.NamedTemplate;
 import com.alphasystem.morphologicalanalysis.morphology.model.ConjugationConfiguration;
 import com.alphasystem.morphologicalanalysis.morphology.model.ConjugationData;
 import com.alphasystem.morphologicalanalysis.morphology.model.RootLetters;
-import com.alphasystem.morphologicalanalysis.morphology.model.support.NounOfPlaceAndTime;
 import com.alphasystem.morphologicalanalysis.morphology.model.support.VerbalNoun;
 import javafx.beans.property.*;
 import javafx.collections.ListChangeListener;
@@ -26,7 +25,6 @@ public final class TableModel {
     private final ObjectProperty<NamedTemplate> template = new SimpleObjectProperty<>(null, "template", FORM_I_CATEGORY_A_GROUP_U_TEMPLATE);
     private final StringProperty translation = new SimpleStringProperty(null, "translation");
     private final ObservableList<VerbalNoun> verbalNouns = observableArrayList();
-    private final ObservableList<NounOfPlaceAndTime> adverbs = observableArrayList();
     private final BooleanProperty removePassiveLine = new SimpleBooleanProperty(FALSE, "removePassiveLine");
     private final BooleanProperty skipRuleProcessing = new SimpleBooleanProperty(FALSE, "skipRuleProcessing");
     private final BooleanProperty viewConjugation = new SimpleBooleanProperty(null, "viewConjugation", FALSE);
@@ -51,7 +49,6 @@ public final class TableModel {
         setTemplate(this.conjugationData.getTemplate());
         setTranslation(this.conjugationData.getTranslation());
         getVerbalNouns().addAll(this.conjugationData.getVerbalNouns());
-        getAdverbs().addAll(this.conjugationData.getAdverbs());
         ConjugationConfiguration configuration = this.conjugationData.getConfiguration();
         setRemovePassiveLine(configuration.isRemovePassiveLine());
         setSkipRuleProcessing(configuration.isSkipRuleProcessing());
@@ -66,13 +63,6 @@ public final class TableModel {
                 List<VerbalNoun> verbalNouns = conjugationData.getVerbalNouns();
                 verbalNouns.clear();
                 verbalNouns.addAll(c.getAddedSubList());
-            }
-        });
-        adverbs.addListener((ListChangeListener<NounOfPlaceAndTime>) c -> {
-            while (c.next()) {
-                List<NounOfPlaceAndTime> adverbs = conjugationData.getAdverbs();
-                adverbs.clear();
-                adverbs.addAll(c.getAddedSubList());
             }
         });
         removePassiveLineProperty().addListener((o, ov, nv) -> conjugationData.getConfiguration().setRemovePassiveLine(nv));
@@ -139,10 +129,6 @@ public final class TableModel {
 
     public final ObservableList<VerbalNoun> getVerbalNouns() {
         return verbalNouns;
-    }
-
-    public final ObservableList<NounOfPlaceAndTime> getAdverbs() {
-        return adverbs;
     }
 
     public final boolean isRemovePassiveLine() {

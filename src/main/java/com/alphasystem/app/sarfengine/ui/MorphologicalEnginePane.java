@@ -16,7 +16,6 @@ import com.alphasystem.morphologicalanalysis.morphology.model.ChartConfiguration
 import com.alphasystem.morphologicalanalysis.morphology.model.ConjugationData;
 import com.alphasystem.morphologicalanalysis.morphology.model.ConjugationTemplate;
 import com.alphasystem.morphologicalanalysis.morphology.model.RootLetters;
-import com.alphasystem.morphologicalanalysis.morphology.model.support.NounOfPlaceAndTime;
 import com.alphasystem.morphologicalanalysis.morphology.model.support.VerbalNoun;
 import de.jensd.fx.glyphs.GlyphIcons;
 import javafx.beans.property.BooleanProperty;
@@ -510,15 +509,6 @@ class MorphologicalEnginePane extends BorderPane {
             if (verbalNouns != null) {
                 selectedItem.getVerbalNouns().addAll(verbalNouns);
             }
-
-            List<NounOfPlaceAndTime> adverbs = NounOfPlaceAndTime.getByTemplate(newValue);
-
-            // clear the currently selected adverbs first then add new values, if there is no adverb mapped
-            // then our list should be empty
-            selectedItem.getAdverbs().clear();
-            if (adverbs != null) {
-                selectedItem.getAdverbs().addAll(adverbs);
-            }
         });
 
         TableColumn<TableModel, Boolean> removePassiveLineColumn = createRemovePassiveLineColumn(mediumColumnWidth);
@@ -558,7 +548,7 @@ class MorphologicalEnginePane extends BorderPane {
 
     private TableColumn<TableModel, NamedTemplate> createTemplateColumn(double largeColumnWidth) {
         TableColumn<TableModel, NamedTemplate> templateColumn = new TableColumn<>();
-        templateColumn.setText("Form");
+        templateColumn.setText("Family");
         templateColumn.setEditable(true);
         templateColumn.setPrefWidth(largeColumnWidth);
         templateColumn.setCellValueFactory(new PropertyValueFactory<>("template"));
