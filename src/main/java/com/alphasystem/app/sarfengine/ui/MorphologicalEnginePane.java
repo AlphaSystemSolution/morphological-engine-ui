@@ -3,12 +3,8 @@ package com.alphasystem.app.sarfengine.ui;
 import com.alphasystem.ApplicationException;
 import com.alphasystem.app.morphologicalengine.conjugation.model.MorphologicalChart;
 import com.alphasystem.app.morphologicalengine.docx.MorphologicalChartEngine;
-import com.alphasystem.app.morphologicalengine.ui.MorphologicalChartControl;
 import com.alphasystem.app.morphologicalengine.util.TemplateReader;
-import com.alphasystem.app.sarfengine.ui.control.ChartConfigurationDialog;
-import com.alphasystem.app.sarfengine.ui.control.FileSelectionDialog;
-import com.alphasystem.app.sarfengine.ui.control.RootLettersTableCell;
-import com.alphasystem.app.sarfengine.ui.control.VerbalNounTableCell;
+import com.alphasystem.app.sarfengine.ui.control.*;
 import com.alphasystem.app.sarfengine.ui.control.model.TabInfo;
 import com.alphasystem.app.sarfengine.ui.control.model.TableModel;
 import com.alphasystem.arabic.model.NamedTemplate;
@@ -101,6 +97,8 @@ class MorphologicalEnginePane extends BorderPane {
     private final TabPane tabPane;
     private final FileSelectionDialog fileSelectionDialog;
     private final ChartConfigurationDialog chartConfigurationDialog;
+    private final MorphologicalChartViewerControl morphologicalChartViewer;
+    private final Stage chartStage;
     private final TemplateReader templateReader = TemplateReader.getInstance();
 
     MorphologicalEnginePane() {
@@ -111,6 +109,9 @@ class MorphologicalEnginePane extends BorderPane {
 
         chartConfigurationDialog = new ChartConfigurationDialog();
         fileSelectionDialog = new FileSelectionDialog(new TabInfo());
+        morphologicalChartViewer = new MorphologicalChartViewerControl();
+        chartStage = new Stage();
+        initViewerStage();
 
         setCenter(tabPane);
         setTop(createToolBar());
@@ -680,7 +681,7 @@ class MorphologicalEnginePane extends BorderPane {
                     alert.show();
                     viewConjugationProperty.setValue(false);
                 } else {
-                    runLater(() -> openViewer(tableModel));
+                    runLater(() -> updateViewer(tableModel));
                     viewConjugationProperty.setValue(false);
                 }
             }
@@ -690,40 +691,33 @@ class MorphologicalEnginePane extends BorderPane {
         return column;
     }
 
-    private void openViewer(TableModel tableModel) {
+    private void updateViewer(TableModel tableModel) {
         ConjugationTemplate conjugationTemplate = new ConjugationTemplate();
         conjugationTemplate.getData().add(tableModel.getConjugationData());
 
         MorphologicalChartEngine engine = new MorphologicalChartEngine(conjugationTemplate);
         final MorphologicalChart morphologicalChart = engine.createMorphologicalCharts().get(0);
-        openViewer(morphologicalChart);
+        morphologicalChartViewer.setMorphologicalChart(null);
+        morphologicalChartViewer.setMorphologicalChart(morphologicalChart);
+        chartStage.show();
     }
 
-    private void openViewer(MorphologicalChart morphologicalChart) {
-        Stage primaryStage = new Stage();
-        primaryStage.setTitle("Morphological Chart Viewer");
+    private void initViewerStage() {
+        chartStage.setTitle("Morphological Chart Viewer");
         Screen screen = Screen.getPrimary();
         Rectangle2D bounds = screen.getVisualBounds();
 
-        primaryStage.setX(bounds.getMinX());
-        primaryStage.setY(bounds.getMinY());
-        primaryStage.setWidth(bounds.getWidth());
-        primaryStage.setHeight(bounds.getHeight());
+        chartStage.setX(bounds.getMinX());
+        chartStage.setY(bounds.getMinY());
+        chartStage.setWidth(bounds.getWidth());
+        chartStage.setHeight(bounds.getHeight());
 
-        primaryStage.setWidth(bounds.getWidth() / 4);
-        primaryStage.setHeight(bounds.getHeight() / 4);
+        chartStage.setWidth(bounds.getWidth() / 4);
+        chartStage.setHeight(bounds.getHeight() / 4);
 
-        MorphologicalChartControl morphologicalChartControl = new MorphologicalChartControl();
-        morphologicalChartControl.setMorphologicalChart(morphologicalChart);
-
-        ScrollPane scrollPane = new ScrollPane();
-        scrollPane.setContent(morphologicalChartControl);
-        scrollPane.setVbarPolicy(AS_NEEDED);
-        scrollPane.setHbarPolicy(AS_NEEDED);
-        Scene scene = new Scene(scrollPane);
-        primaryStage.setMaximized(true);
-        primaryStage.setScene(scene);
-        primaryStage.show();
+        Scene scene = new Scene(morphologicalChartViewer);
+        chartStage.setMaximized(true);
+        chartStage.setScene(scene);
     }
 
     void setDialogOwner(Stage primaryStage) {
