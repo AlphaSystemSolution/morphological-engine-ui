@@ -16,7 +16,7 @@ public class MorphologicalEngineApp extends Application {
     }
 
     public void start(Stage primaryStage) throws Exception {
-        primaryStage.setTitle("Sarf Engine UI");
+        primaryStage.setTitle("Morphological Engine UI");
         Screen screen = Screen.getPrimary();
         Rectangle2D bounds = screen.getVisualBounds();
 
