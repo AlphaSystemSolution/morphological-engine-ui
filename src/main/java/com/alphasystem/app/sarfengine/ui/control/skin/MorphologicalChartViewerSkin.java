@@ -7,6 +7,7 @@ import com.alphasystem.app.sarfengine.ui.control.MorphologicalChartViewerControl
 import com.alphasystem.arabic.model.ArabicLetterType;
 import com.alphasystem.fx.ui.Browser;
 import com.alphasystem.fx.ui.util.UiUtilities;
+import javafx.concurrent.Worker;
 import javafx.scene.control.SkinBase;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
@@ -36,6 +37,7 @@ public class MorphologicalChartViewerSkin extends SkinBase<MorphologicalChartVie
         private final MorphologicalChartViewerControl control;
         private final MorphologicalChartControl morphologicalChartControl;
         private final Browser browser;
+        private final TabPane tabPane;
         private Tab morphologicalChartTab;
         private Tab dictionaryTab;
 
@@ -43,12 +45,12 @@ public class MorphologicalChartViewerSkin extends SkinBase<MorphologicalChartVie
             this.control = control;
             this.morphologicalChartControl = new MorphologicalChartControl();
             this.browser = new Browser();
+            this.tabPane = new TabPane();
             this.control.morphologicalChartProperty().addListener((observable, oldValue, newValue) -> initialize(newValue));
             setup();
         }
 
         private void setup() {
-            TabPane tabPane = new TabPane();
             tabPane.setTabClosingPolicy(TabPane.TabClosingPolicy.UNAVAILABLE);
 
             BorderPane borderPane = new BorderPane();
@@ -65,6 +67,7 @@ public class MorphologicalChartViewerSkin extends SkinBase<MorphologicalChartVie
         }
 
         private void initialize(MorphologicalChart morphologicalChart) {
+            tabPane.getSelectionModel().select(0);
             boolean disable = morphologicalChart == null;
             if (disable) {
                 morphologicalChartTab.setDisable(true);
@@ -80,9 +83,16 @@ public class MorphologicalChartViewerSkin extends SkinBase<MorphologicalChartVie
             String fr = format("%s", (fourthRadical == null) ? "" : fourthRadical.toCode());
             String searchString = format("%s%s%s%s", rootLetters.getFirstRadical().toCode(),
                     rootLetters.getSecondRadical().toCode(), rootLetters.getThirdRadical().toCode(), fr);
+
             String url = format("%s%s", MAWRID_READER_URL, searchString);
+            System.out.println("Before: " + url);
+            browser.getWebEngine().getLoadWorker().stateProperty().addListener((observable, oldValue, newValue) -> {
+                dictionaryTab.setDisable(true);
+                if (Worker.State.SUCCEEDED.equals(newValue)) {
+                    dictionaryTab.setDisable(false);
+                }
+            });
             browser.loadUrl(url);
-            dictionaryTab.setDisable(false);
         }
 
     }
