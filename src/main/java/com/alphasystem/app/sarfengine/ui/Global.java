@@ -1,12 +1,13 @@
 package com.alphasystem.app.sarfengine.ui;
 
+import com.alphasystem.app.morphologicalengine.ui.util.MorphologicalEngineUIPreferences;
 import com.alphasystem.app.morphologicalengine.util.TemplateReader;
 import com.alphasystem.arabic.model.ArabicSupport;
+import com.alphasystem.util.GenericPreferences;
 import javafx.scene.text.Text;
 import javafx.stage.FileChooser;
 
 import static com.alphasystem.arabic.model.ArabicLetterType.WAW;
-import static com.alphasystem.fx.ui.util.FontConstants.ARABIC_FONT_24;
 import static com.alphasystem.util.AppUtil.USER_HOME_DIR;
 
 /**
@@ -22,10 +23,12 @@ public final class Global {
                 TemplateReader.SARF_FILE_EXTENSION_ALL));
     }
 
+    private static final MorphologicalEngineUIPreferences PREFERENCES = (MorphologicalEngineUIPreferences) GenericPreferences.getInstance();
+
     public static Text createLabel(ArabicSupport letter) {
         Text text = new Text();
         text.setText(letter == null ? "" : letter.toLabel().toUnicode());
-        text.setFont(ARABIC_FONT_24);
+        text.setFont(PREFERENCES.getArabicFont());
         return text;
     }
 
@@ -46,7 +49,7 @@ public final class Global {
         return new Text(builder.toString());
     }
 
-    public static double roundTo100(double srcValue) {
+    static double roundTo100(double srcValue) {
         return (double) ((((int) srcValue) + 99) / 100) * 100;
     }
 }

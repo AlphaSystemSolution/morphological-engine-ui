@@ -3,6 +3,7 @@ package com.alphasystem.app.sarfengine.ui;
 import com.alphasystem.ApplicationException;
 import com.alphasystem.app.morphologicalengine.conjugation.model.MorphologicalChart;
 import com.alphasystem.app.morphologicalengine.docx.MorphologicalChartEngine;
+import com.alphasystem.app.morphologicalengine.ui.util.MorphologicalEngineUIPreferences;
 import com.alphasystem.app.morphologicalengine.util.TemplateReader;
 import com.alphasystem.app.sarfengine.ui.control.*;
 import com.alphasystem.app.sarfengine.ui.control.model.TabInfo;
@@ -13,6 +14,7 @@ import com.alphasystem.morphologicalanalysis.morphology.model.ConjugationData;
 import com.alphasystem.morphologicalanalysis.morphology.model.ConjugationTemplate;
 import com.alphasystem.morphologicalanalysis.morphology.model.RootLetters;
 import com.alphasystem.morphologicalanalysis.morphology.model.support.VerbalNoun;
+import com.alphasystem.util.GenericPreferences;
 import de.jensd.fx.glyphs.GlyphIcons;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.value.ObservableValue;
@@ -60,8 +62,6 @@ import java.util.Optional;
 
 import static com.alphasystem.app.sarfengine.ui.Global.*;
 import static com.alphasystem.arabic.ui.ComboBoxHelper.createComboBox;
-import static com.alphasystem.fx.ui.util.FontConstants.ARABIC_FONT_24;
-import static com.alphasystem.fx.ui.util.FontConstants.ENGLISH_FONT_12;
 import static de.jensd.fx.glyphs.GlyphsDude.setIcon;
 import static de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon.*;
 import static de.jensd.fx.glyphs.materialicons.MaterialIcon.ADD_BOX;
@@ -100,6 +100,7 @@ class MorphologicalEnginePane extends BorderPane {
     private final MorphologicalChartViewerControl morphologicalChartViewer;
     private final Stage chartStage;
     private final TemplateReader templateReader = TemplateReader.getInstance();
+    private final MorphologicalEngineUIPreferences preferences;
 
     MorphologicalEnginePane() {
         tabPane = new TabPane();
@@ -107,6 +108,7 @@ class MorphologicalEnginePane extends BorderPane {
         tabPane.setBackground(BACKGROUND);
         newAction();
 
+        preferences= (MorphologicalEngineUIPreferences) GenericPreferences.getInstance();
         chartConfigurationDialog = new ChartConfigurationDialog();
         fileSelectionDialog = new FileSelectionDialog(new TabInfo());
         morphologicalChartViewer = new MorphologicalChartViewerControl();
@@ -564,12 +566,12 @@ class MorphologicalEnginePane extends BorderPane {
                 setAlignment(Pos.CENTER);
                 comboBox = createComboBox(NamedTemplate.values());
                 arabicText = new Text();
-                arabicText.setFont(ARABIC_FONT_24);
+                arabicText.setFont(preferences.getArabicFont());
                 arabicText.setTextAlignment(CENTER);
                 arabicText.setNodeOrientation(RIGHT_TO_LEFT);
                 labelText = new Text();
                 labelText.setTextAlignment(CENTER);
-                labelText.setFont(ENGLISH_FONT_12);
+                labelText.setFont(preferences.getEnglishFont());
 
                 comboBox.getSelectionModel().selectedItemProperty().addListener((o, ov, nv) -> commitEdit(nv));
             }
