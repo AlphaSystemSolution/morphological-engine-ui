@@ -109,7 +109,7 @@ public class ChartConfigurationSkin extends SkinBase<ChartConfigurationView> {
         arabicFontFamilyComboBox.valueProperty().bindBidirectional(view.arabicFontFamilyProperty());
         gridPane.add(arabicFontFamilyComboBox, 1, 0);
 
-        label = new Label("Translation Font Family");
+        label = new Label("Translation Font Family:");
         gridPane.add(label, 2, 0);
         ComboBox<String> translationFontFamilyComboBox = new ComboBox<>();
         translationFontFamilyComboBox.getItems().addAll(Font.getFamilies());
