@@ -3,7 +3,7 @@ package com.alphasystem.app.sarfengine.ui;
 import com.alphasystem.ApplicationException;
 import com.alphasystem.app.morphologicalengine.conjugation.model.MorphologicalChart;
 import com.alphasystem.app.morphologicalengine.docx.MorphologicalChartEngine;
-import com.alphasystem.app.morphologicalengine.ui.util.MorphologicalEngineUIPreferences;
+import com.alphasystem.app.morphologicalengine.ui.util.MorphologicalEnginePreferences;
 import com.alphasystem.app.morphologicalengine.util.TemplateReader;
 import com.alphasystem.app.sarfengine.ui.control.*;
 import com.alphasystem.app.sarfengine.ui.control.model.TabInfo;
@@ -100,15 +100,15 @@ class MorphologicalEnginePane extends BorderPane {
     private final MorphologicalChartViewerControl morphologicalChartViewer;
     private final Stage chartStage;
     private final TemplateReader templateReader = TemplateReader.getInstance();
-    private final MorphologicalEngineUIPreferences preferences;
+    private final MorphologicalEnginePreferences preferences;
 
     MorphologicalEnginePane() {
+        preferences = (MorphologicalEnginePreferences) GenericPreferences.getInstance();
         tabPane = new TabPane();
         tabPane.setTabClosingPolicy(SELECTED_TAB);
         tabPane.setBackground(BACKGROUND);
         newAction();
 
-        preferences= (MorphologicalEngineUIPreferences) GenericPreferences.getInstance();
         chartConfigurationDialog = new ChartConfigurationDialog();
         fileSelectionDialog = new FileSelectionDialog(new TabInfo());
         morphologicalChartViewer = new MorphologicalChartViewerControl();
@@ -188,7 +188,11 @@ class MorphologicalEnginePane extends BorderPane {
 
     private ScrollPane createTable(ConjugationTemplate conjugationTemplate) {
         if (conjugationTemplate == null) {
+            ChartConfiguration chartConfiguration = new ChartConfiguration();
+            chartConfiguration.setArabicFontFamily(preferences.getArabicFontName());
+            chartConfiguration.setTranslationFontFamily(preferences.getEnglishFontName());
             conjugationTemplate = new ConjugationTemplate();
+            conjugationTemplate.setChartConfiguration(chartConfiguration);
         }
         ObservableList<TableModel> tableModels = observableArrayList();
         List<ConjugationData> dataList = conjugationTemplate.getData();
