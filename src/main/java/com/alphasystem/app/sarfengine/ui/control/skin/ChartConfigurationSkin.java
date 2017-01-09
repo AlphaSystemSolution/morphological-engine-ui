@@ -100,80 +100,96 @@ public class ChartConfigurationSkin extends SkinBase<ChartConfigurationView> {
 
         ChartConfigurationView view = getSkinnable();
 
-        int row = 0;
         Label label = new Label("Arabic Font Family:");
-        gridPane.add(label, 0, row);
+        gridPane.add(label, 0, 0);
         ComboBox<String> arabicFontFamilyComboBox = new ComboBox<>();
         arabicFontFamilyComboBox.getItems().addAll(Font.getFamilies());
-        arabicFontFamilyComboBox.getSelectionModel().selectFirst();
+        arabicFontFamilyComboBox.setValue(view.getArabicFontFamily());
         label.setLabelFor(arabicFontFamilyComboBox);
         arabicFontFamilyComboBox.valueProperty().bindBidirectional(view.arabicFontFamilyProperty());
+        gridPane.add(arabicFontFamilyComboBox, 1, 0);
 
         label = new Label("Translation Font Family");
-        gridPane.add(label, 1, row);
+        gridPane.add(label, 2, 0);
         ComboBox<String> translationFontFamilyComboBox = new ComboBox<>();
         translationFontFamilyComboBox.getItems().addAll(Font.getFamilies());
-        translationFontFamilyComboBox.getSelectionModel().selectFirst();
+        translationFontFamilyComboBox.setValue(view.getTranslationFontFamily());
         label.setLabelFor(translationFontFamilyComboBox);
         translationFontFamilyComboBox.valueProperty().bindBidirectional(view.translationFontFamilyProperty());
+        gridPane.add(translationFontFamilyComboBox, 3, 0);
 
-        row++;
-        gridPane.add(arabicFontFamilyComboBox, 0, row);
-        gridPane.add(translationFontFamilyComboBox, 1, row);
-
-        row++;
         label = new Label("UI Arabic Font Size:");
-        gridPane.add(label, 0, row);
+        gridPane.add(label, 0, 1);
         ComboBox<Long> uiArabicFontSizeComboBox = new ComboBox<>();
         uiArabicFontSizeComboBox.setEditable(true);
         uiArabicFontSizeComboBox.getItems().addAll(SIZE_ARRAY);
         uiArabicFontSizeComboBox.setConverter(new FontSizeStringConverter());
-        uiArabicFontSizeComboBox.getSelectionModel().select(view.getArabicUiFontSize());
+        uiArabicFontSizeComboBox.setValue(view.getArabicUiFontSize());
         label.setLabelFor(uiArabicFontSizeComboBox);
         uiArabicFontSizeComboBox.valueProperty().addListener((observable, oldValue, newValue) -> view.setArabicUiFontSize(newValue));
         view.arabicUiFontSizeProperty().addListener((observable, oldValue, newValue) -> uiArabicFontSizeComboBox.setValue((Long) newValue));
+        gridPane.add(uiArabicFontSizeComboBox, 1, 1);
 
         label = new Label("UI Translation Font Size:");
-        gridPane.add(label, 1, row);
+        gridPane.add(label, 2, 1);
         ComboBox<Long> uiTranslationFontSizeComboBox = new ComboBox<>();
         uiTranslationFontSizeComboBox.setEditable(true);
         uiTranslationFontSizeComboBox.getItems().addAll(SIZE_ARRAY);
         uiTranslationFontSizeComboBox.setConverter(new FontSizeStringConverter());
-        uiTranslationFontSizeComboBox.getSelectionModel().select(view.getTranslationUiFontSize());
+        uiTranslationFontSizeComboBox.setValue(view.getTranslationUiFontSize());
         label.setLabelFor(uiTranslationFontSizeComboBox);
         uiTranslationFontSizeComboBox.valueProperty().addListener((observable, oldValue, newValue) -> view.setTranslationUiFontSize(newValue));
         view.translationUiFontSizeProperty().addListener((observable, oldValue, newValue) -> uiTranslationFontSizeComboBox.setValue((Long) newValue));
+        gridPane.add(uiTranslationFontSizeComboBox, 3, 1);
 
-        row++;
-        gridPane.add(uiArabicFontSizeComboBox, 0, row);
-        gridPane.add(uiTranslationFontSizeComboBox, 1, row);
+        label = new Label("UI Heading Font Size:");
+        gridPane.add(label, 0, 2);
+        ComboBox<Long> uiHeadingFontSizeComboBox = new ComboBox<>();
+        uiHeadingFontSizeComboBox.setEditable(true);
+        uiHeadingFontSizeComboBox.getItems().addAll(SIZE_ARRAY);
+        uiHeadingFontSizeComboBox.setConverter(new FontSizeStringConverter());
+        uiHeadingFontSizeComboBox.setValue(view.getHeadingUiFontSize());
+        label.setLabelFor(uiHeadingFontSizeComboBox);
+        uiHeadingFontSizeComboBox.valueProperty().addListener((observable, oldValue, newValue) -> view.setHeadingUiFontSize(newValue));
+        view.headingUiFontSizeProperty().addListener((observable, oldValue, newValue) -> uiHeadingFontSizeComboBox.setValue((Long) newValue));
+        gridPane.add(uiHeadingFontSizeComboBox, 1, 2);
 
-        row++;
         label = new Label("Word Arabic Font Size:");
-        gridPane.add(label, 0, row);
+        gridPane.add(label, 2, 2);
         ComboBox<Long> wordArabicFontSizeComboBox = new ComboBox<>();
         wordArabicFontSizeComboBox.setEditable(true);
         wordArabicFontSizeComboBox.getItems().addAll(SIZE_ARRAY);
         wordArabicFontSizeComboBox.setConverter(new FontSizeStringConverter());
-        wordArabicFontSizeComboBox.getSelectionModel().select(view.getArabicFontSize());
+        wordArabicFontSizeComboBox.setValue(view.getArabicFontSize());
         label.setLabelFor(wordArabicFontSizeComboBox);
         wordArabicFontSizeComboBox.valueProperty().addListener((observable, oldValue, newValue) -> view.setArabicFontSize(newValue));
         view.translationFontSizeProperty().addListener((observable, oldValue, newValue) -> wordArabicFontSizeComboBox.setValue((Long) newValue));
+        gridPane.add(wordArabicFontSizeComboBox, 3, 2);
 
         label = new Label("Word Translation Font Size:");
-        gridPane.add(label, 1, row);
+        gridPane.add(label, 0, 3);
         ComboBox<Long> wordTranslationFontSizeComboBox = new ComboBox<>();
         wordTranslationFontSizeComboBox.setEditable(true);
         wordTranslationFontSizeComboBox.getItems().addAll(SIZE_ARRAY);
         wordTranslationFontSizeComboBox.setConverter(new FontSizeStringConverter());
-        wordTranslationFontSizeComboBox.getSelectionModel().select(view.getTranslationFontSize());
+        wordTranslationFontSizeComboBox.setValue(view.getTranslationFontSize());
         label.setLabelFor(wordTranslationFontSizeComboBox);
         wordTranslationFontSizeComboBox.valueProperty().addListener((observable, oldValue, newValue) -> view.setTranslationFontSize(newValue));
         view.translationFontSizeProperty().addListener((observable, oldValue, newValue) -> wordTranslationFontSizeComboBox.setValue((Long) newValue));
+        gridPane.add(wordTranslationFontSizeComboBox, 1, 3);
 
-        row++;
-        gridPane.add(wordArabicFontSizeComboBox, 0, row);
-        gridPane.add(wordTranslationFontSizeComboBox, 1, row);
+        label = new Label("Word Heading Font Size:");
+        gridPane.add(label, 2, 3);
+        ComboBox<Long> wordHeadingFontSizeComboBox = new ComboBox<>();
+        wordHeadingFontSizeComboBox.setEditable(true);
+        wordHeadingFontSizeComboBox.getItems().addAll(SIZE_ARRAY);
+        wordHeadingFontSizeComboBox.setConverter(new FontSizeStringConverter());
+        wordHeadingFontSizeComboBox.setValue(view.getHeadingFontSize());
+        label.setLabelFor(wordHeadingFontSizeComboBox);
+        wordHeadingFontSizeComboBox.valueProperty().addListener((observable, oldValue, newValue) -> view.setHeadingFontSize(newValue));
+        view.headingFontSizeProperty().addListener((observable, oldValue, newValue) -> wordHeadingFontSizeComboBox.setValue((Long) newValue));
+        gridPane.add(wordHeadingFontSizeComboBox, 3, 3);
+
 
         gridPane.getStyleClass().add("view");
         BorderPane borderPane = new BorderPane();

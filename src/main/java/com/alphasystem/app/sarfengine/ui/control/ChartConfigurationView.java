@@ -33,6 +33,8 @@ public class ChartConfigurationView extends Control {
     private final LongProperty arabicUiFontSize = new SimpleLongProperty(this, "arabicUiFontSize");
     private final LongProperty translationFontSize = new SimpleLongProperty(this, "translationFontSize");
     private final LongProperty translationUiFontSize = new SimpleLongProperty(this, "translationUiFontSize");
+    private final LongProperty headingFontSize = new SimpleLongProperty(this, "headingFontSize");
+    private final LongProperty headingUiFontSize = new SimpleLongProperty(this, "headingUiFontSize");
 
     public ChartConfigurationView() {
         chartConfigurationProperty().addListener((o, ov, nv) -> {
@@ -50,6 +52,8 @@ public class ChartConfigurationView extends Control {
             setArabicUiFontSize(preferences.getArabicFontSize());
             setTranslationFontSize(nv.getTranslationFontSize());
             setTranslationUiFontSize(preferences.getEnglishFontSize());
+            setHeadingFontSize(nv.getHeadingFontSize());
+            setHeadingUiFontSize(preferences.getArabicHeadingFontSize());
         });
 
         omitAbbreviatedConjugationProperty().addListener((o, ov, nv) -> getChartConfiguration().setOmitAbbreviatedConjugation(nv));
@@ -72,9 +76,11 @@ public class ChartConfigurationView extends Control {
         translationFontSizeProperty().addListener((o, ov, nv) -> getChartConfiguration().setTranslationFontSize((Long) nv));
         arabicUiFontSizeProperty().addListener((o, ov, nv) -> preferences.setArabicFontSize((Long) nv));
         translationUiFontSizeProperty().addListener((o, ov, nv) -> preferences.setEnglishFontSize((Long) nv));
+        headingFontSizeProperty().addListener((o, ov, nv) -> getChartConfiguration().setHeadingFontSize((Long) nv));
+        headingUiFontSizeProperty().addListener((o, ov, nv) -> preferences.setArabicHeadingFontSize((Long) nv));
 
         setChartConfiguration(null);
-        setMinWidth(600);
+        setMinWidth(900);
     }
 
     @Override
@@ -234,5 +240,29 @@ public class ChartConfigurationView extends Control {
 
     public final void setTranslationUiFontSize(long translationUiFontSize) {
         this.translationUiFontSize.set(translationUiFontSize);
+    }
+
+    public final long getHeadingFontSize() {
+        return headingFontSize.get();
+    }
+
+    public final LongProperty headingFontSizeProperty() {
+        return headingFontSize;
+    }
+
+    public final void setHeadingFontSize(long headingFontSize) {
+        this.headingFontSize.set(headingFontSize);
+    }
+
+    public final long getHeadingUiFontSize() {
+        return headingUiFontSize.get();
+    }
+
+    public final LongProperty headingUiFontSizeProperty() {
+        return headingUiFontSize;
+    }
+
+    public final void setHeadingUiFontSize(long headingUiFontSize) {
+        this.headingUiFontSize.set(headingUiFontSize);
     }
 }
