@@ -103,7 +103,7 @@ class MorphologicalEnginePane extends BorderPane {
     private final MorphologicalEnginePreferences preferences;
 
     MorphologicalEnginePane() {
-        preferences = (MorphologicalEnginePreferences) GenericPreferences.getInstance();
+        preferences = GenericPreferences.getInstance(MorphologicalEnginePreferences.class);
         tabPane = new TabPane();
         tabPane.setTabClosingPolicy(SELECTED_TAB);
         tabPane.setBackground(BACKGROUND);

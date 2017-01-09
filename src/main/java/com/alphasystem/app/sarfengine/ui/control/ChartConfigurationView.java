@@ -17,7 +17,7 @@ import static com.alphasystem.util.AppUtil.getResource;
  */
 public class ChartConfigurationView extends Control {
 
-    private final MorphologicalEnginePreferences preferences = (MorphologicalEnginePreferences) GenericPreferences.getInstance();
+    private final MorphologicalEnginePreferences preferences = GenericPreferences.getInstance(MorphologicalEnginePreferences.class);
     private final ObjectProperty<ChartConfiguration> chartConfiguration = new SimpleObjectProperty<>();
     private final BooleanProperty omitToc = new SimpleBooleanProperty();
     private final BooleanProperty omitAbbreviatedConjugation = new SimpleBooleanProperty();
@@ -87,7 +87,6 @@ public class ChartConfigurationView extends Control {
     public String getUserAgentStylesheet() {
         return getResource("arabic-ui-support.css").toExternalForm();
     }
-
 
     @Override
     protected Skin<?> createDefaultSkin() {

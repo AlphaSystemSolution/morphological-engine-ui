@@ -23,7 +23,7 @@ public final class Global {
                 TemplateReader.SARF_FILE_EXTENSION_ALL));
     }
 
-    private static final MorphologicalEnginePreferences PREFERENCES = (MorphologicalEnginePreferences) GenericPreferences.getInstance();
+    private static final MorphologicalEnginePreferences PREFERENCES = GenericPreferences.getInstance(MorphologicalEnginePreferences.class);
 
     public static Text createLabel(ArabicSupport letter) {
         Text text = new Text();
