@@ -42,7 +42,9 @@ import javafx.scene.control.cell.CheckBoxTableCell;
 import javafx.scene.control.cell.ComboBoxTableCell;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.control.cell.TextFieldTableCell;
+import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyCodeCombination;
+import javafx.scene.input.KeyCombination;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.BorderPane;
@@ -81,10 +83,6 @@ import static javafx.scene.control.ContentDisplay.GRAPHIC_ONLY;
 import static javafx.scene.control.ScrollPane.ScrollBarPolicy.AS_NEEDED;
 import static javafx.scene.control.SelectionMode.SINGLE;
 import static javafx.scene.control.TabPane.TabClosingPolicy.SELECTED_TAB;
-import static javafx.scene.input.KeyCode.E;
-import static javafx.scene.input.KeyCode.S;
-import static javafx.scene.input.KeyCombination.ALT_DOWN;
-import static javafx.scene.input.KeyCombination.CONTROL_DOWN;
 import static javafx.scene.text.TextAlignment.CENTER;
 import static javafx.stage.Screen.getPrimary;
 import static org.apache.commons.io.FilenameUtils.getBaseName;
@@ -234,27 +232,33 @@ class MorphologicalEnginePane extends BorderPane {
     private ToolBar createToolBar() {
         ToolBar toolBar = new ToolBar();
 
-        toolBar.getItems().add(createButton("Create New File", FontAwesomeIcon.FILE_ALT, event -> newAction()));
-        toolBar.getItems().add(createButton("Open File", FontAwesomeIcon.FOLDER_OPEN_ALT, event -> openAction()));
+        final Button newButton = createButton("Create New File", FontAwesomeIcon.FILE_ALT, event -> newAction());
+        final Button openButton = createButton("Open File", FontAwesomeIcon.FOLDER_OPEN_ALT, event -> openAction());
+
+        // getScene().getAccelerators().put(new KeyCodeCombination(KeyCode.N, KeyCombination.CONTROL_DOWN), this::newAction);
+        // getScene().getAccelerators().put(new KeyCodeCombination(KeyCode.O, KeyCombination.CONTROL_DOWN), this::openAction);
+        toolBar.getItems().addAll(newButton, openButton);
 
         MenuButton menuButton = new MenuButton();
+        final KeyCodeCombination save = new KeyCodeCombination(KeyCode.S, KeyCombination.CONTROL_DOWN);
+        // getScene().getAccelerators().put(save, this::saveAction);
         menuButton.setText("Save");
         setIcon(menuButton, FontAwesomeIcon.SAVE, "2em");
 
         MenuItem menuItem = new MenuItem("Save");
 
-        menuItem.setAccelerator(new KeyCodeCombination(S, CONTROL_DOWN));
-        menuItem.setOnAction(event -> saveAction(SaveMode.SAVE));
-        setIcon(menuItem,  FontAwesomeIcon.SAVE);
+        menuItem.setAccelerator(save);
+        menuItem.setOnAction(event -> saveAction());
+        setIcon(menuItem, FontAwesomeIcon.SAVE);
         menuButton.getItems().add(menuItem);
 
         menuItem = new MenuItem("Save As ...");
-        menuItem.setOnAction(event -> saveAction(SaveMode.SAVE_AS));
-        menuItem.setAccelerator(new KeyCodeCombination(S, ALT_DOWN, CONTROL_DOWN));
+        menuItem.setOnAction(event -> saveAsAction());
+        menuItem.setAccelerator(new KeyCodeCombination(KeyCode.S, KeyCombination.ALT_DOWN, KeyCombination.CONTROL_DOWN));
         menuButton.getItems().add(menuItem);
 
         menuItem = new MenuItem("Save Selected Data ...");
-        menuItem.setOnAction(event -> saveAction(SaveMode.SAVE_SELECTED));
+        menuItem.setOnAction(event -> saveSelectedAction());
         menuButton.getItems().add(menuItem);
         toolBar.getItems().add(menuButton);
 
@@ -264,7 +268,7 @@ class MorphologicalEnginePane extends BorderPane {
 
         menuItem = new MenuItem();
         setIcon(menuItem, FontAwesomeIcon.FILE_WORD_ALT);
-        menuItem.setAccelerator(new KeyCodeCombination(E, CONTROL_DOWN, ALT_DOWN));
+        menuItem.setAccelerator(new KeyCodeCombination(KeyCode.W, KeyCombination.CONTROL_DOWN, KeyCombination.ALT_DOWN));
         menuItem.setOnAction(event -> saveAction(SaveMode.EXPORT_TO_WORD));
         menuButton.getItems().add(menuItem);
         toolBar.getItems().add(menuButton);
@@ -386,6 +390,18 @@ class MorphologicalEnginePane extends BorderPane {
         service.start();
     }
 
+    private void saveAction() {
+        saveAction(SaveMode.SAVE);
+    }
+
+    private void saveAsAction() {
+        saveAction(SaveMode.SAVE_AS);
+    }
+
+    private void saveSelectedAction() {
+        saveAction(SaveMode.SAVE_SELECTED);
+    }
+
     private void saveAction(SaveMode saveMode) {
         final TabInfo tabInfo = getTabUserData();
         if (tabInfo != null) {
@@ -415,7 +431,7 @@ class MorphologicalEnginePane extends BorderPane {
                 ConjugationTemplate conjugationTemplate = getConjugationTemplate(currentItems,
                         tabInfo.getChartConfiguration());
                 templateReader.saveFile(sarfxFile, conjugationTemplate);
-                if(SaveMode.EXPORT_TO_WORD.equals(saveMode)) {
+                if (SaveMode.EXPORT_TO_WORD.equals(saveMode)) {
                     saveAsDocx(tabInfo, conjugationTemplate);
                 }
 
