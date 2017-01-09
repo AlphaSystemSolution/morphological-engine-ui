@@ -1,6 +1,6 @@
 package com.alphasystem.app.sarfengine.ui;
 
-import com.alphasystem.app.morphologicalengine.ui.util.MorphologicalEngineUIPreferences;
+import com.alphasystem.app.morphologicalengine.ui.util.MorphologicalEnginePreferences;
 import com.alphasystem.app.morphologicalengine.util.TemplateReader;
 import com.alphasystem.arabic.model.ArabicSupport;
 import com.alphasystem.util.GenericPreferences;
@@ -23,7 +23,7 @@ public final class Global {
                 TemplateReader.SARF_FILE_EXTENSION_ALL));
     }
 
-    private static final MorphologicalEngineUIPreferences PREFERENCES = (MorphologicalEngineUIPreferences) GenericPreferences.getInstance();
+    private static final MorphologicalEnginePreferences PREFERENCES = (MorphologicalEnginePreferences) GenericPreferences.getInstance();
 
     public static Text createLabel(ArabicSupport letter) {
         Text text = new Text();
