@@ -92,6 +92,9 @@ public class MorphologicalChartViewerSkin extends SkinBase<MorphologicalChartVie
                     dictionaryTab.setDisable(false);
                 }
             });
+            browser.getWebEngine().locationProperty().addListener((observable, oldValue, newValue) -> {
+                System.out.println("After " + newValue);
+            });
             browser.loadUrl(url);
         }
 

@@ -16,6 +16,8 @@ import com.alphasystem.morphologicalanalysis.morphology.model.RootLetters;
 import com.alphasystem.morphologicalanalysis.morphology.model.support.VerbalNoun;
 import com.alphasystem.util.GenericPreferences;
 import de.jensd.fx.glyphs.GlyphIcons;
+import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon;
+import de.jensd.fx.glyphs.materialdesignicons.MaterialDesignIcon;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.ObservableList;
@@ -63,7 +65,8 @@ import java.util.Optional;
 import static com.alphasystem.app.sarfengine.ui.Global.*;
 import static com.alphasystem.arabic.ui.ComboBoxHelper.createComboBox;
 import static de.jensd.fx.glyphs.GlyphsDude.setIcon;
-import static de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon.*;
+import static de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon.CLONE;
+import static de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon.REMOVE;
 import static de.jensd.fx.glyphs.materialicons.MaterialIcon.ADD_BOX;
 import static de.jensd.fx.glyphs.materialicons.MaterialIcon.SETTINGS_APPLICATIONS;
 import static java.lang.Math.max;
@@ -71,12 +74,14 @@ import static java.lang.String.format;
 import static javafx.application.Platform.runLater;
 import static javafx.collections.FXCollections.observableArrayList;
 import static javafx.geometry.NodeOrientation.RIGHT_TO_LEFT;
-import static javafx.scene.control.Alert.AlertType.*;
+import static javafx.scene.control.Alert.AlertType.CONFIRMATION;
+import static javafx.scene.control.Alert.AlertType.ERROR;
 import static javafx.scene.control.ButtonType.*;
 import static javafx.scene.control.ContentDisplay.GRAPHIC_ONLY;
 import static javafx.scene.control.ScrollPane.ScrollBarPolicy.AS_NEEDED;
 import static javafx.scene.control.SelectionMode.SINGLE;
 import static javafx.scene.control.TabPane.TabClosingPolicy.SELECTED_TAB;
+import static javafx.scene.input.KeyCode.E;
 import static javafx.scene.input.KeyCode.S;
 import static javafx.scene.input.KeyCombination.ALT_DOWN;
 import static javafx.scene.input.KeyCombination.CONTROL_DOWN;
@@ -229,24 +234,40 @@ class MorphologicalEnginePane extends BorderPane {
     private ToolBar createToolBar() {
         ToolBar toolBar = new ToolBar();
 
-        toolBar.getItems().add(createButton("Create New File", FILE_ALT, event -> newAction()));
-        toolBar.getItems().add(createButton("Open File", FOLDER_OPEN_ALT, event -> openAction()));
+        toolBar.getItems().add(createButton("Create New File", FontAwesomeIcon.FILE_ALT, event -> newAction()));
+        toolBar.getItems().add(createButton("Open File", FontAwesomeIcon.FOLDER_OPEN_ALT, event -> openAction()));
 
-        SplitMenuButton splitMenuButton = new SplitMenuButton();
-        splitMenuButton.setText("Save");
-        setIcon(splitMenuButton, FILE_WORD_ALT, "2em");
+        MenuButton menuButton = new MenuButton();
+        menuButton.setText("Save");
+        setIcon(menuButton, FontAwesomeIcon.SAVE, "2em");
+
         MenuItem menuItem = new MenuItem("Save");
+
         menuItem.setAccelerator(new KeyCodeCombination(S, CONTROL_DOWN));
         menuItem.setOnAction(event -> saveAction(SaveMode.SAVE));
-        splitMenuButton.getItems().add(menuItem);
+        setIcon(menuItem,  FontAwesomeIcon.SAVE);
+        menuButton.getItems().add(menuItem);
+
         menuItem = new MenuItem("Save As ...");
         menuItem.setOnAction(event -> saveAction(SaveMode.SAVE_AS));
         menuItem.setAccelerator(new KeyCodeCombination(S, ALT_DOWN, CONTROL_DOWN));
-        splitMenuButton.getItems().add(menuItem);
+        menuButton.getItems().add(menuItem);
+
         menuItem = new MenuItem("Save Selected Data ...");
         menuItem.setOnAction(event -> saveAction(SaveMode.SAVE_SELECTED));
-        splitMenuButton.getItems().add(menuItem);
-        toolBar.getItems().add(splitMenuButton);
+        menuButton.getItems().add(menuItem);
+        toolBar.getItems().add(menuButton);
+
+        menuButton = new MenuButton();
+        setIcon(menuButton, MaterialDesignIcon.EXPORT, "2em");
+        menuButton.setTooltip(new Tooltip("Export Conjugation to external format"));
+
+        menuItem = new MenuItem();
+        setIcon(menuItem, FontAwesomeIcon.FILE_WORD_ALT);
+        menuItem.setAccelerator(new KeyCodeCombination(E, CONTROL_DOWN, ALT_DOWN));
+        menuItem.setOnAction(event -> saveAction(SaveMode.EXPORT_TO_WORD));
+        menuButton.getItems().add(menuItem);
+        toolBar.getItems().add(menuButton);
 
         toolBar.getItems().add(new Separator());
         toolBar.getItems().add(createButton("Add new Row", ADD_BOX, event -> addNewRowAction()));
@@ -394,7 +415,9 @@ class MorphologicalEnginePane extends BorderPane {
                 ConjugationTemplate conjugationTemplate = getConjugationTemplate(currentItems,
                         tabInfo.getChartConfiguration());
                 templateReader.saveFile(sarfxFile, conjugationTemplate);
-                saveAsDocx(tabInfo, conjugationTemplate);
+                if(SaveMode.EXPORT_TO_WORD.equals(saveMode)) {
+                    saveAsDocx(tabInfo, conjugationTemplate);
+                }
 
                 Tab currentTab = getCurrentTab();
                 currentTab.setText(TemplateReader.getFileNameNoExtension(sarfxFile));
@@ -429,8 +452,10 @@ class MorphologicalEnginePane extends BorderPane {
         service.setOnSucceeded(event -> {
             makeDirty(false);
             changeToDefaultCursor();
-            Alert alert = new Alert(INFORMATION);
-            alert.setContentText("Document publishing has been finished.");
+            Alert alert = new Alert(CONFIRMATION);
+            final String message = format("Document \"%s\" has been published.%s Would like to open it?",
+                    tabInfo.getDocxFile().getName(), System.lineSeparator());
+            alert.setContentText(message);
             Optional<ButtonType> result = alert.showAndWait();
             result.ifPresent(buttonType -> {
                 try {
@@ -753,7 +778,7 @@ class MorphologicalEnginePane extends BorderPane {
     }
 
     private enum SaveMode {
-        SAVE, SAVE_AS, SAVE_SELECTED
+        SAVE, SAVE_AS, SAVE_SELECTED, EXPORT_TO_WORD
     }
 
     private class FileOpenService extends Service<Tab> {

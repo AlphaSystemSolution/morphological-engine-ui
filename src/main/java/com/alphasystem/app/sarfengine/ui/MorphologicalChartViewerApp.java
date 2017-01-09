@@ -4,17 +4,15 @@ import com.alphasystem.app.morphologicalengine.conjugation.model.MorphologicalCh
 import com.alphasystem.app.morphologicalengine.docx.MorphologicalChartEngine;
 import com.alphasystem.app.sarfengine.ui.control.MorphologicalChartViewerControl;
 import com.alphasystem.arabic.model.ArabicLetterType;
+import com.alphasystem.arabic.model.NamedTemplate;
 import com.alphasystem.morphologicalanalysis.morphology.model.ConjugationData;
 import com.alphasystem.morphologicalanalysis.morphology.model.ConjugationTemplate;
 import com.alphasystem.morphologicalanalysis.morphology.model.RootLetters;
-import com.alphasystem.morphologicalanalysis.morphology.model.support.VerbalNoun;
 import javafx.application.Application;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.Scene;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
-
-import static com.alphasystem.arabic.model.NamedTemplate.FORM_I_CATEGORY_I_GROUP_A_TEMPLATE;
 
 /**
  * @author sali
@@ -40,10 +38,10 @@ public class MorphologicalChartViewerApp extends Application {
 
         ConjugationTemplate conjugationTemplate = new ConjugationTemplate();
         ConjugationData conjugationData = new ConjugationData();
-        conjugationData.setTemplate(FORM_I_CATEGORY_I_GROUP_A_TEMPLATE);
-        conjugationData.setTranslation("To Mercy");
-        conjugationData.addVerbalNouns(VerbalNoun.VERBAL_NOUN_V1, VerbalNoun.VERBAL_NOUN_V27);
-        conjugationData.setRootLetters(new RootLetters(ArabicLetterType.RA, ArabicLetterType.HHA, ArabicLetterType.MEEM));
+        conjugationData.setTemplate(NamedTemplate.FORM_IV_TEMPLATE);
+        conjugationData.setTranslation("To Submit");
+        // conjugationData.addVerbalNouns(VerbalNoun.VERBAL_NOUN_V1, VerbalNoun.VERBAL_NOUN_V27);
+        conjugationData.setRootLetters(new RootLetters(ArabicLetterType.HAMZA, ArabicLetterType.MEEM, ArabicLetterType.NOON));
         conjugationTemplate.getData().add(conjugationData);
 
         MorphologicalChartEngine engine = new MorphologicalChartEngine(conjugationTemplate);
