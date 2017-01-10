@@ -85,16 +85,17 @@ public class MorphologicalChartViewerSkin extends SkinBase<MorphologicalChartVie
                     rootLetters.getSecondRadical().toCode(), rootLetters.getThirdRadical().toCode(), fr);
 
             String url = format("%s%s", MAWRID_READER_URL, searchString);
-            System.out.println("Before: " + url);
+            // System.out.println("Before: " + url);
             browser.getWebEngine().getLoadWorker().stateProperty().addListener((observable, oldValue, newValue) -> {
-                dictionaryTab.setDisable(true);
-                if (Worker.State.SUCCEEDED.equals(newValue)) {
-                    dictionaryTab.setDisable(false);
+                if (Worker.State.FAILED.equals(newValue)) {
+                    dictionaryTab.setDisable(true);
                 }
+                // System.out.println(String.format("The state is %s", newValue));
             });
-            browser.getWebEngine().locationProperty().addListener((observable, oldValue, newValue) -> {
-                System.out.println("After " + newValue);
-            });
+//            browser.getWebEngine().locationProperty().addListener((observable, oldValue, newValue) -> {
+//                System.out.println("After " + newValue);
+//            });
+            dictionaryTab.setDisable(false);
             browser.loadUrl(url);
         }
 
