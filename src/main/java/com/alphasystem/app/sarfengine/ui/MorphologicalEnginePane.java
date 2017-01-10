@@ -105,12 +105,12 @@ class MorphologicalEnginePane extends BorderPane {
     private final TemplateReader templateReader = TemplateReader.getInstance();
     private final MorphologicalEnginePreferences preferences;
 
-    MorphologicalEnginePane() {
+    MorphologicalEnginePane(File initialFile) {
         preferences = GenericPreferences.getInstance(MorphologicalEnginePreferences.class);
         tabPane = new TabPane();
         tabPane.setTabClosingPolicy(SELECTED_TAB);
         tabPane.setBackground(BACKGROUND);
-        newAction();
+        openAction(initialFile);
 
         chartConfigurationDialog = new ChartConfigurationDialog();
         fileSelectionDialog = new FileSelectionDialog(new TabInfo());
@@ -376,6 +376,13 @@ class MorphologicalEnginePane extends BorderPane {
                 // use might have cancel the dialog
                 return;
             }
+        }
+        openAction(file);
+    }
+
+    private void openAction(File file) {
+        if (file == null || !file.exists()) {
+            file = null;
         }
         FileOpenService service = new FileOpenService(file);
         service.setOnSucceeded(event -> {
@@ -767,7 +774,11 @@ class MorphologicalEnginePane extends BorderPane {
         chartStage.setScene(scene);
     }
 
-    void setDialogOwner(Stage primaryStage) {
+    void initDependencies(Stage primaryStage) {
+        setDialogOwner(primaryStage);
+    }
+
+    private void setDialogOwner(Stage primaryStage) {
         Window owner = fileSelectionDialog.getOwner();
         if (owner == null) {
             fileSelectionDialog.initOwner(primaryStage);
