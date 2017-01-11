@@ -1,6 +1,7 @@
 package com.alphasystem.app.sarfengine.ui;
 
 import com.alphasystem.ApplicationException;
+import com.alphasystem.BusinessException;
 import com.alphasystem.app.morphologicalengine.conjugation.model.MorphologicalChart;
 import com.alphasystem.app.morphologicalengine.docx.MorphologicalChartEngine;
 import com.alphasystem.app.morphologicalengine.ui.util.MorphologicalEnginePreferences;
@@ -114,6 +115,7 @@ class MorphologicalEnginePane extends BorderPane {
 
         chartConfigurationDialog = new ChartConfigurationDialog();
         fileSelectionDialog = new FileSelectionDialog(new TabInfo());
+        FILE_CHOOSER.setInitialDirectory(preferences.getInitialDirectory());
         morphologicalChartViewer = new MorphologicalChartViewerControl();
         chartStage = new Stage();
         initViewerStage();
@@ -164,6 +166,14 @@ class MorphologicalEnginePane extends BorderPane {
         Tab tab = new Tab(getTabTitle(file), createTable(template));
         TabInfo value = new TabInfo();
         if (file != null) {
+            final File parentFile = file.getParentFile();
+            FILE_CHOOSER.setInitialDirectory(parentFile);
+            preferences.setInitialDirectory(parentFile);
+            try {
+                preferences.save();
+            } catch (BusinessException e) {
+                e.printStackTrace();
+            }
             value.setSarfxFile(file);
             value.setDocxFile(TemplateReader.getDocxFile(file));
         }

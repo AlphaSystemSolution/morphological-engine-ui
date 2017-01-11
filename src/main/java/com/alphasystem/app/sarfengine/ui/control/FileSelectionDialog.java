@@ -7,11 +7,8 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.geometry.Insets;
-import javafx.scene.control.Button;
+import javafx.scene.control.*;
 import javafx.scene.control.ButtonBar.ButtonData;
-import javafx.scene.control.Dialog;
-import javafx.scene.control.Label;
-import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
 
 import java.io.File;
@@ -21,7 +18,7 @@ import static javafx.beans.binding.Bindings.when;
 import static javafx.geometry.Pos.CENTER;
 import static javafx.scene.control.ButtonType.CANCEL;
 import static javafx.scene.control.ButtonType.OK;
-import static javafx.stage.Modality.WINDOW_MODAL;
+import static javafx.stage.Modality.APPLICATION_MODAL;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 
 /**
@@ -37,23 +34,25 @@ public class FileSelectionDialog extends Dialog<TabInfo> {
         super();
 
         setTitle("Select Files");
-        initModality(WINDOW_MODAL);
+        initModality(APPLICATION_MODAL);
 
         tabInfoProperty().addListener((o, ov, nv) -> initDialogPane(nv));
         setTabInfo(src);
 
         getDialogPane().getButtonTypes().addAll(OK, CANCEL);
 
-        setResultConverter(param -> {
-            ButtonData buttonData = param.getButtonData();
-            if (buttonData.isDefaultButton()) {
-                return tabInfoProperty().get();
-            }
-            return null;
-        });
+        setResultConverter(this::setResult);
 
         Button okButton = (Button) getDialogPane().lookupButton(OK);
         okButton.disableProperty().bind(when(sarfxFile.isNotNull()).then(false).otherwise(true));
+    }
+
+    private TabInfo setResult(ButtonType param) {
+        ButtonData buttonData = param.getButtonData();
+        if (buttonData.isDefaultButton()) {
+            return tabInfoProperty().get();
+        }
+        return null;
     }
 
     private void initDialogPane(TabInfo tabInfo) {
@@ -63,7 +62,7 @@ public class FileSelectionDialog extends Dialog<TabInfo> {
         gridPane.setAlignment(CENTER);
         gridPane.setPadding(new Insets(DEFAULT_VALUE, DEFAULT_VALUE, DEFAULT_VALUE, DEFAULT_VALUE));
 
-        Label label = new Label("Selected Sarfx File:");
+        Label label = new Label("Selected Sarf File:");
         TextField sarfxField = new TextField(getSafeFilePath(tabInfo.getSarfxFile()));
         sarfxField.setPrefColumnCount(30);
         sarfxField.setDisable(true);
@@ -71,7 +70,7 @@ public class FileSelectionDialog extends Dialog<TabInfo> {
         Button button = new Button(" ... ");
         button.setOnAction(event -> {
             File file = FILE_CHOOSER.showSaveDialog(getOwner());
-                if (file != null) {
+            if (file != null) {
                 File sarfxFile = TemplateReader.getSarfxFile(file);
                 sarfxField.setText(sarfxFile.getAbsolutePath());
             }
@@ -80,7 +79,7 @@ public class FileSelectionDialog extends Dialog<TabInfo> {
         gridPane.add(sarfxField, 1, 0);
         gridPane.add(button, 2, 0);
 
-        label = new Label("Selected Docx File:");
+        label = new Label("Selected Word File:");
         TextField textField = new TextField(getSafeFilePath(tabInfo.getDocxFile()));
         textField.setPrefColumnCount(30);
         textField.setDisable(true);
@@ -106,11 +105,12 @@ public class FileSelectionDialog extends Dialog<TabInfo> {
         return file == null ? "" : file.getAbsolutePath();
     }
 
-    public final ObjectProperty<TabInfo> tabInfoProperty() {
+    private ObjectProperty<TabInfo> tabInfoProperty() {
         return tabInfo;
     }
 
     public final void setTabInfo(TabInfo tabInfo) {
         this.tabInfo.set(tabInfo);
     }
+
 }
