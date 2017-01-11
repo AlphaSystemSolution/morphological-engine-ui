@@ -28,7 +28,9 @@ public class ChartConfigurationView extends Control {
     private final ObjectProperty<SortDirective> sortDirective = new SimpleObjectProperty<>();
     private final ObjectProperty<SortDirection> sortDirection = new SimpleObjectProperty<>();
     private final StringProperty arabicFontFamily = new SimpleStringProperty(this, "arabicFontFamily");
+    private final StringProperty arabicUiFontFamily = new SimpleStringProperty(this, "arabicUiFontFamily");
     private final StringProperty translationFontFamily = new SimpleStringProperty(this, "translationFontFamily");
+    private final StringProperty translationUiFontFamily = new SimpleStringProperty(this, "translationUiFontFamily");
     private final LongProperty arabicFontSize = new SimpleLongProperty(this, "arabicFontSize");
     private final LongProperty arabicUiFontSize = new SimpleLongProperty(this, "arabicUiFontSize");
     private final LongProperty translationFontSize = new SimpleLongProperty(this, "translationFontSize");
@@ -50,10 +52,12 @@ public class ChartConfigurationView extends Control {
             String fontFamily = nv.getArabicFontFamily();
             fontFamily = (fontFamily == null) ? preferences.getArabicFontName() : fontFamily;
             setArabicFontFamily(fontFamily);
+            setArabicUiFontFamily(preferences.getArabicFontName());
 
             fontFamily = nv.getTranslationFontFamily();
             fontFamily = (fontFamily == null) ? preferences.getEnglishFontName() : fontFamily;
             setTranslationFontFamily(fontFamily);
+            setTranslationUiFontFamily(preferences.getEnglishFontName());
 
             long size = nv.getArabicFontSize();
             size = (size <= 0) ? preferences.getArabicFontSize() : size;
@@ -79,23 +83,19 @@ public class ChartConfigurationView extends Control {
         omitTocProperty().addListener((o, ov, nv) -> getChartConfiguration().setOmitToc(nv));
         sortDirectionProperty().addListener((o, ov, nv) -> getChartConfiguration().setSortDirection(nv));
         sortDirectiveProperty().addListener((o, ov, nv) -> getChartConfiguration().setSortDirective(nv));
-        arabicFontFamilyProperty().addListener((o, ov, nv) -> {
-            getChartConfiguration().setArabicFontFamily(nv);
-            preferences.setArabicFontName(nv);
-        });
-        translationFontFamilyProperty().addListener((o, ov, nv) -> {
-            getChartConfiguration().setTranslationFontFamily(nv);
-            preferences.setEnglishFontName(nv);
-        });
+        arabicFontFamilyProperty().addListener((o, ov, nv) -> getChartConfiguration().setArabicFontFamily(nv));
+        arabicUiFontFamilyProperty().addListener((o, ov, nv) -> preferences.setArabicFontName(nv));
+        translationFontFamilyProperty().addListener((o, ov, nv) -> getChartConfiguration().setTranslationFontFamily(nv));
+        translationUiFontFamilyProperty().addListener((o, ov, nv) -> preferences.setEnglishFontName(nv));
         arabicFontSizeProperty().addListener((o, ov, nv) -> getChartConfiguration().setArabicFontSize((Long) nv));
-        translationFontSizeProperty().addListener((o, ov, nv) -> getChartConfiguration().setTranslationFontSize((Long) nv));
         arabicUiFontSizeProperty().addListener((o, ov, nv) -> preferences.setArabicFontSize((Long) nv));
+        translationFontSizeProperty().addListener((o, ov, nv) -> getChartConfiguration().setTranslationFontSize((Long) nv));
         translationUiFontSizeProperty().addListener((o, ov, nv) -> preferences.setEnglishFontSize((Long) nv));
         headingFontSizeProperty().addListener((o, ov, nv) -> getChartConfiguration().setHeadingFontSize((Long) nv));
         headingUiFontSizeProperty().addListener((o, ov, nv) -> preferences.setArabicHeadingFontSize((Long) nv));
 
         setChartConfiguration(null);
-        setMinWidth(900);
+        setMinWidth(600);
     }
 
     @Override
@@ -196,6 +196,18 @@ public class ChartConfigurationView extends Control {
         this.arabicFontFamily.set(arabicFontFamily);
     }
 
+    public final String getArabicUiFontFamily() {
+        return arabicUiFontFamily.get();
+    }
+
+    public final StringProperty arabicUiFontFamilyProperty() {
+        return arabicUiFontFamily;
+    }
+
+    public final void setArabicUiFontFamily(String arabicUiFontFamily) {
+        this.arabicUiFontFamily.set(arabicUiFontFamily);
+    }
+
     public final String getTranslationFontFamily() {
         return translationFontFamily.get();
     }
@@ -206,6 +218,18 @@ public class ChartConfigurationView extends Control {
 
     public final void setTranslationFontFamily(String translationFontFamily) {
         this.translationFontFamily.set(translationFontFamily);
+    }
+
+    public final String getTranslationUiFontFamily() {
+        return translationUiFontFamily.get();
+    }
+
+    public final StringProperty translationUiFontFamilyProperty() {
+        return translationUiFontFamily;
+    }
+
+    public final void setTranslationUiFontFamily(String translationUiFontFamily) {
+        this.translationUiFontFamily.set(translationUiFontFamily);
     }
 
     public final long getArabicFontSize() {
