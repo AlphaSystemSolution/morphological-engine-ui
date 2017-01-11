@@ -46,13 +46,28 @@ public class ChartConfigurationView extends Control {
             setOmitToc(nv.isOmitToc());
             setSortDirection(nv.getSortDirection());
             setSortDirective(nv.getSortDirective());
-            setArabicFontFamily(nv.getArabicFontFamily());
-            setTranslationFontFamily(nv.getTranslationFontFamily());
-            setArabicFontSize(nv.getArabicFontSize());
+
+            String fontFamily = nv.getArabicFontFamily();
+            fontFamily = (fontFamily == null) ? preferences.getArabicFontName() : fontFamily;
+            setArabicFontFamily(fontFamily);
+
+            fontFamily = nv.getTranslationFontFamily();
+            fontFamily = (fontFamily == null) ? preferences.getEnglishFontName() : fontFamily;
+            setTranslationFontFamily(fontFamily);
+
+            long size = nv.getArabicFontSize();
+            size = (size <= 0) ? preferences.getArabicFontSize() : size;
+            setArabicFontSize(size);
             setArabicUiFontSize(preferences.getArabicFontSize());
-            setTranslationFontSize(nv.getTranslationFontSize());
+
+            size = nv.getTranslationFontSize();
+            size = (size <= 0) ? preferences.getEnglishFontSize() : size;
+            setTranslationFontSize(size);
             setTranslationUiFontSize(preferences.getEnglishFontSize());
-            setHeadingFontSize(nv.getHeadingFontSize());
+
+            size = nv.getHeadingFontSize();
+            size = (size <= 0) ? preferences.getArabicHeadingFontSize() : size;
+            setHeadingFontSize(size);
             setHeadingUiFontSize(preferences.getArabicHeadingFontSize());
         });
 
