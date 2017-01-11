@@ -37,6 +37,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonBar.ButtonData;
+import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.cell.CheckBoxTableCell;
@@ -46,10 +47,7 @@ import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.input.KeyCombination;
-import javafx.scene.layout.Background;
-import javafx.scene.layout.BackgroundFill;
-import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.CornerRadii;
+import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextFlow;
@@ -121,6 +119,7 @@ class MorphologicalEnginePane extends BorderPane {
         initViewerStage();
 
         setCenter(tabPane);
+        // setTop(new VBox(5, createMenuBar(), createToolBar()));
         setTop(createToolBar());
         setBackground(BACKGROUND);
     }
@@ -204,6 +203,9 @@ class MorphologicalEnginePane extends BorderPane {
             ChartConfiguration chartConfiguration = new ChartConfiguration();
             chartConfiguration.setArabicFontFamily(preferences.getArabicFontName());
             chartConfiguration.setTranslationFontFamily(preferences.getEnglishFontName());
+            chartConfiguration.setArabicFontSize(preferences.getArabicFontSize());
+            chartConfiguration.setTranslationFontSize(preferences.getEnglishFontSize());
+            chartConfiguration.setHeadingFontSize(preferences.getArabicHeadingFontSize());
             conjugationTemplate = new ConjugationTemplate();
             conjugationTemplate.setChartConfiguration(chartConfiguration);
         }
@@ -237,6 +239,12 @@ class MorphologicalEnginePane extends BorderPane {
         setIcon(button, icon, "2em");
         button.setOnAction(event);
         return button;
+    }
+
+    private MenuBar createMenuBar() {
+        MenuBar menuBar = new MenuBar();
+
+        return menuBar;
     }
 
     private ToolBar createToolBar() {
