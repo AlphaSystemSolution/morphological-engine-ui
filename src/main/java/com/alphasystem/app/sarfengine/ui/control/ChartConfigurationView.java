@@ -39,7 +39,7 @@ public class ChartConfigurationView extends Control {
     private final LongProperty headingUiFontSize = new SimpleLongProperty(this, "headingUiFontSize");
 
     public ChartConfigurationView() {
-        chartConfigurationProperty().addListener((o, ov, nv) -> {
+        chartConfiguration.addListener((o, ov, nv) -> {
             setOmitAbbreviatedConjugation(nv.isOmitAbbreviatedConjugation());
             setOmitDetailedConjugation(nv.isOmitDetailedConjugation());
             setOmitHeader(nv.isOmitHeader());
@@ -108,23 +108,19 @@ public class ChartConfigurationView extends Control {
         return new ChartConfigurationSkin(this);
     }
 
-    public final ChartConfiguration getChartConfiguration() {
+    final ChartConfiguration getChartConfiguration() {
         return chartConfiguration.get();
     }
 
-    public final void setChartConfiguration(ChartConfiguration chartConfiguration) {
+    final void setChartConfiguration(ChartConfiguration chartConfiguration) {
         this.chartConfiguration.set(chartConfiguration == null ? new ChartConfiguration() : chartConfiguration);
-    }
-
-    public final ObjectProperty<ChartConfiguration> chartConfigurationProperty() {
-        return chartConfiguration;
     }
 
     public final BooleanProperty omitTocProperty() {
         return omitToc;
     }
 
-    public final void setOmitToc(boolean omitToc) {
+    private void setOmitToc(boolean omitToc) {
         this.omitToc.set(omitToc);
     }
 
@@ -132,7 +128,7 @@ public class ChartConfigurationView extends Control {
         return omitAbbreviatedConjugation;
     }
 
-    public final void setOmitAbbreviatedConjugation(boolean omitAbbreviatedConjugation) {
+    private void setOmitAbbreviatedConjugation(boolean omitAbbreviatedConjugation) {
         this.omitAbbreviatedConjugation.set(omitAbbreviatedConjugation);
     }
 
@@ -140,7 +136,7 @@ public class ChartConfigurationView extends Control {
         return omitDetailedConjugation;
     }
 
-    public final void setOmitDetailedConjugation(boolean omitDetailedConjugation) {
+    private void setOmitDetailedConjugation(boolean omitDetailedConjugation) {
         this.omitDetailedConjugation.set(omitDetailedConjugation);
     }
 
@@ -148,7 +144,7 @@ public class ChartConfigurationView extends Control {
         return omitTitle;
     }
 
-    public final void setOmitTitle(boolean omitTitle) {
+    private void setOmitTitle(boolean omitTitle) {
         this.omitTitle.set(omitTitle);
     }
 
@@ -156,7 +152,7 @@ public class ChartConfigurationView extends Control {
         return omitHeader;
     }
 
-    public final void setOmitHeader(boolean omitHeader) {
+    private void setOmitHeader(boolean omitHeader) {
         this.omitHeader.set(omitHeader);
     }
 
@@ -164,7 +160,7 @@ public class ChartConfigurationView extends Control {
         return omitSarfTermCaption;
     }
 
-    public final void setOmitSarfTermCaption(boolean omitSarfTermCaption) {
+    private void setOmitSarfTermCaption(boolean omitSarfTermCaption) {
         this.omitSarfTermCaption.set(omitSarfTermCaption);
     }
 
@@ -172,7 +168,7 @@ public class ChartConfigurationView extends Control {
         return sortDirective;
     }
 
-    public final void setSortDirective(SortDirective sortDirective) {
+    private void setSortDirective(SortDirective sortDirective) {
         this.sortDirective.set(sortDirective);
     }
 
@@ -180,7 +176,7 @@ public class ChartConfigurationView extends Control {
         return sortDirection;
     }
 
-    public final void setSortDirection(SortDirection sortDirection) {
+    private void setSortDirection(SortDirection sortDirection) {
         this.sortDirection.set(sortDirection);
     }
 
@@ -192,19 +188,15 @@ public class ChartConfigurationView extends Control {
         return arabicFontFamily;
     }
 
-    public final void setArabicFontFamily(String arabicFontFamily) {
+    private void setArabicFontFamily(String arabicFontFamily) {
         this.arabicFontFamily.set(arabicFontFamily);
-    }
-
-    public final String getArabicUiFontFamily() {
-        return arabicUiFontFamily.get();
     }
 
     public final StringProperty arabicUiFontFamilyProperty() {
         return arabicUiFontFamily;
     }
 
-    public final void setArabicUiFontFamily(String arabicUiFontFamily) {
+    private void setArabicUiFontFamily(String arabicUiFontFamily) {
         this.arabicUiFontFamily.set(arabicUiFontFamily);
     }
 
@@ -216,19 +208,15 @@ public class ChartConfigurationView extends Control {
         return translationFontFamily;
     }
 
-    public final void setTranslationFontFamily(String translationFontFamily) {
+    private void setTranslationFontFamily(String translationFontFamily) {
         this.translationFontFamily.set(translationFontFamily);
-    }
-
-    public final String getTranslationUiFontFamily() {
-        return translationUiFontFamily.get();
     }
 
     public final StringProperty translationUiFontFamilyProperty() {
         return translationUiFontFamily;
     }
 
-    public final void setTranslationUiFontFamily(String translationUiFontFamily) {
+    private void setTranslationUiFontFamily(String translationUiFontFamily) {
         this.translationUiFontFamily.set(translationUiFontFamily);
     }
 
@@ -236,7 +224,7 @@ public class ChartConfigurationView extends Control {
         return arabicFontSize.get();
     }
 
-    public final LongProperty arabicFontSizeProperty() {
+    private LongProperty arabicFontSizeProperty() {
         return arabicFontSize;
     }
 
