@@ -1,6 +1,8 @@
 package com.alphasystem.app.sarfengine.ui.control.model;
 
+import com.alphasystem.app.morphologicalengine.ui.util.MorphologicalEnginePreferences;
 import com.alphasystem.morphologicalanalysis.morphology.model.ChartConfiguration;
+import com.alphasystem.util.GenericPreferences;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleBooleanProperty;
@@ -17,6 +19,7 @@ public final class TabInfo {
     private final ObjectProperty<File> sarfxFile = new SimpleObjectProperty<>();
     private final ObjectProperty<ChartConfiguration> chartConfiguration = new SimpleObjectProperty<>();
     private final BooleanProperty dirty = new SimpleBooleanProperty();
+    private final MorphologicalEnginePreferences preferences = GenericPreferences.getInstance(MorphologicalEnginePreferences.class);
 
     public TabInfo() {
         setDirty(true);
@@ -52,7 +55,15 @@ public final class TabInfo {
     }
 
     public void setChartConfiguration(ChartConfiguration chartConfiguration) {
-        this.chartConfiguration.set(chartConfiguration == null ? new ChartConfiguration() : chartConfiguration);
+        if (chartConfiguration == null) {
+            chartConfiguration = new ChartConfiguration();
+            chartConfiguration.setArabicFontFamily(preferences.getArabicFontName());
+            chartConfiguration.setTranslationFontFamily(preferences.getEnglishFontName());
+            chartConfiguration.setArabicFontSize(preferences.getArabicFontSize());
+            chartConfiguration.setTranslationFontSize(preferences.getEnglishFontSize());
+            chartConfiguration.setHeadingFontSize(preferences.getArabicHeadingFontSize());
+        }
+        this.chartConfiguration.set(chartConfiguration);
     }
 
     public ObjectProperty<ChartConfiguration> chartConfigurationProperty() {
