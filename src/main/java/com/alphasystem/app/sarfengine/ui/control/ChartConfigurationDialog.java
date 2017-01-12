@@ -1,6 +1,7 @@
 package com.alphasystem.app.sarfengine.ui.control;
 
 import com.alphasystem.BusinessException;
+import com.alphasystem.app.morphologicalengine.ui.util.MorphologicalEnginePreferences;
 import com.alphasystem.morphologicalanalysis.morphology.model.ChartConfiguration;
 import com.alphasystem.util.GenericPreferences;
 import javafx.scene.control.ButtonType;
@@ -30,7 +31,7 @@ public class ChartConfigurationDialog extends Dialog<ChartConfiguration> {
     private ChartConfiguration save(ButtonType param) {
         final ChartConfiguration chartConfiguration = param.getButtonData().isDefaultButton() ? view.getChartConfiguration() : null;
         try {
-            GenericPreferences.getInstance().save();
+            GenericPreferences.getInstance(MorphologicalEnginePreferences.class).save();
         } catch (BusinessException e) {
             e.printStackTrace();
         }
