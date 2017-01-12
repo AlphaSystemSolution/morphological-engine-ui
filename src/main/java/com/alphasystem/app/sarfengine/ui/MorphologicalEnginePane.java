@@ -16,6 +16,8 @@ import com.alphasystem.morphologicalanalysis.morphology.model.ConjugationTemplat
 import com.alphasystem.morphologicalanalysis.morphology.model.RootLetters;
 import com.alphasystem.morphologicalanalysis.morphology.model.support.VerbalNoun;
 import com.alphasystem.util.GenericPreferences;
+import com.sun.javafx.scene.control.behavior.TabPaneBehavior;
+import com.sun.javafx.scene.control.skin.TabPaneSkin;
 import javafx.application.Platform;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.value.ObservableValue;
@@ -351,7 +353,11 @@ class MorphologicalEnginePane extends BorderPane {
     void closeAction() {
         final Tab currentTab = getCurrentTab();
         if (currentTab != null) {
-            //TODO:
+            final TabPaneSkin skin = (TabPaneSkin) tabPane.getSkin();
+            final TabPaneBehavior behavior = skin.getBehavior();
+            if(behavior.canCloseTab(currentTab)){
+                behavior.closeTab(currentTab);
+            }
         }
     }
 

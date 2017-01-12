@@ -157,7 +157,7 @@ final class MenuController {
 
         Menu fileMenu = new Menu("File");
         fileMenu.getItems().addAll(createNewMenuItem(), createOpenMenuItem(), new SeparatorMenuItem(), createSaveMenuItem(),
-                createSaveAsMenuItem(), createSaveSelectedMenuItem(), new SeparatorMenuItem(), createExitMenuItem());
+                createSaveAsMenuItem(), createSaveSelectedMenuItem(), new SeparatorMenuItem(), createCloseMenuItem(), createExitMenuItem());
 
         Menu tableMenu = new Menu("Table");
         tableMenu.getItems().addAll(createAddRowMenuItem(), createCloneRowsMenuItem(), createRemoveRowsMenuItem());
