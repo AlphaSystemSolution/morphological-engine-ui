@@ -10,6 +10,8 @@ import javafx.beans.property.SimpleObjectProperty;
 
 import java.io.File;
 
+import static org.apache.commons.lang3.StringUtils.isEmpty;
+
 /**
  * @author sali
  */
@@ -34,20 +36,12 @@ public final class TabInfo {
         this.docxFile.set(docxFile);
     }
 
-    public final ObjectProperty<File> docxFileProperty() {
-        return docxFile;
-    }
-
     public final File getSarfxFile() {
         return sarfxFile.get();
     }
 
     public final void setSarfxFile(File sarfxFile) {
         this.sarfxFile.set(sarfxFile);
-    }
-
-    public final ObjectProperty<File> sarfxFileProperty() {
-        return sarfxFile;
     }
 
     public ChartConfiguration getChartConfiguration() {
@@ -57,17 +51,27 @@ public final class TabInfo {
     public void setChartConfiguration(ChartConfiguration chartConfiguration) {
         if (chartConfiguration == null) {
             chartConfiguration = new ChartConfiguration();
-            chartConfiguration.setArabicFontFamily(preferences.getArabicFontName());
-            chartConfiguration.setTranslationFontFamily(preferences.getEnglishFontName());
-            chartConfiguration.setArabicFontSize(preferences.getArabicFontSize());
-            chartConfiguration.setTranslationFontSize(preferences.getEnglishFontSize());
-            chartConfiguration.setHeadingFontSize(preferences.getArabicHeadingFontSize());
         }
-        this.chartConfiguration.set(chartConfiguration);
-    }
+        String fontFamily = chartConfiguration.getArabicFontFamily();
+        fontFamily = isEmpty(fontFamily) ? preferences.getArabicFontName() : fontFamily;
+        chartConfiguration.setArabicFontFamily(fontFamily);
 
-    public ObjectProperty<ChartConfiguration> chartConfigurationProperty() {
-        return chartConfiguration;
+        fontFamily = chartConfiguration.getTranslationFontFamily();
+        fontFamily = isEmpty(fontFamily) ? preferences.getEnglishFontName() : fontFamily;
+        chartConfiguration.setTranslationFontFamily(fontFamily);
+
+        long fontSize = chartConfiguration.getArabicFontSize();
+        fontSize = (fontSize <= 0) ? preferences.getArabicFontSize() : fontSize;
+        chartConfiguration.setArabicFontSize(fontSize);
+
+        fontSize = chartConfiguration.getTranslationFontSize();
+        fontSize = (fontSize <= 0) ? preferences.getEnglishFontSize() : fontSize;
+        chartConfiguration.setTranslationFontSize(fontSize);
+
+        fontSize = chartConfiguration.getHeadingFontSize();
+        fontSize = (fontSize <= 0) ? preferences.getArabicHeadingFontSize() : fontSize;
+        chartConfiguration.setHeadingFontSize(fontSize);
+        this.chartConfiguration.set(chartConfiguration);
     }
 
     public final boolean getDirty() {
@@ -78,7 +82,4 @@ public final class TabInfo {
         this.dirty.set(dirty);
     }
 
-    public final BooleanProperty dirtyProperty() {
-        return dirty;
-    }
 }
