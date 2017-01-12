@@ -16,17 +16,13 @@ import com.alphasystem.morphologicalanalysis.morphology.model.ConjugationTemplat
 import com.alphasystem.morphologicalanalysis.morphology.model.RootLetters;
 import com.alphasystem.morphologicalanalysis.morphology.model.support.VerbalNoun;
 import com.alphasystem.util.GenericPreferences;
-import de.jensd.fx.glyphs.GlyphIcons;
-import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon;
-import de.jensd.fx.glyphs.materialdesignicons.MaterialDesignIcon;
+import javafx.application.Platform;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Service;
 import javafx.concurrent.Task;
 import javafx.concurrent.WorkerStateEvent;
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.geometry.Rectangle2D;
@@ -35,18 +31,12 @@ import javafx.scene.Group;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
-import javafx.scene.control.Button;
 import javafx.scene.control.ButtonBar.ButtonData;
-import javafx.scene.control.MenuBar;
-import javafx.scene.control.MenuItem;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.cell.CheckBoxTableCell;
 import javafx.scene.control.cell.ComboBoxTableCell;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.control.cell.TextFieldTableCell;
-import javafx.scene.input.KeyCode;
-import javafx.scene.input.KeyCodeCombination;
-import javafx.scene.input.KeyCombination;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
@@ -65,11 +55,6 @@ import java.util.Optional;
 
 import static com.alphasystem.app.sarfengine.ui.Global.*;
 import static com.alphasystem.arabic.ui.ComboBoxHelper.createComboBox;
-import static de.jensd.fx.glyphs.GlyphsDude.setIcon;
-import static de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon.CLONE;
-import static de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon.REMOVE;
-import static de.jensd.fx.glyphs.materialicons.MaterialIcon.ADD_BOX;
-import static de.jensd.fx.glyphs.materialicons.MaterialIcon.SETTINGS_APPLICATIONS;
 import static java.lang.Math.max;
 import static java.lang.String.format;
 import static javafx.application.Platform.runLater;
@@ -119,8 +104,8 @@ class MorphologicalEnginePane extends BorderPane {
         initViewerStage();
 
         setCenter(tabPane);
-        // setTop(new VBox(5, createMenuBar(), createToolBar()));
-        setTop(createToolBar());
+        final MenuController menuController = MenuController.getInstance(this);
+        setTop(new VBox(5, menuController.createMenuBar(), menuController.createToolBar()));
         setBackground(BACKGROUND);
     }
 
@@ -233,75 +218,7 @@ class MorphologicalEnginePane extends BorderPane {
         return scrollPane;
     }
 
-    private Button createButton(String tooltip, GlyphIcons icon, EventHandler<ActionEvent> event) {
-        Button button = new Button();
-        button.setTooltip(new Tooltip(tooltip));
-        setIcon(button, icon, "2em");
-        button.setOnAction(event);
-        return button;
-    }
-
-    private MenuBar createMenuBar() {
-        MenuBar menuBar = new MenuBar();
-
-        return menuBar;
-    }
-
-    private ToolBar createToolBar() {
-        ToolBar toolBar = new ToolBar();
-
-        final Button newButton = createButton("Create New File", FontAwesomeIcon.FILE_ALT, event -> newAction());
-        final Button openButton = createButton("Open File", FontAwesomeIcon.FOLDER_OPEN_ALT, event -> openAction());
-
-        // getScene().getAccelerators().put(new KeyCodeCombination(KeyCode.N, KeyCombination.CONTROL_DOWN), this::newAction);
-        // getScene().getAccelerators().put(new KeyCodeCombination(KeyCode.O, KeyCombination.CONTROL_DOWN), this::openAction);
-        toolBar.getItems().addAll(newButton, openButton);
-
-        MenuButton menuButton = new MenuButton();
-        final KeyCodeCombination save = new KeyCodeCombination(KeyCode.S, KeyCombination.CONTROL_DOWN);
-        // getScene().getAccelerators().put(save, this::saveAction);
-        menuButton.setText("Save");
-        setIcon(menuButton, FontAwesomeIcon.SAVE, "2em");
-
-        MenuItem menuItem = new MenuItem("Save");
-
-        menuItem.setAccelerator(save);
-        menuItem.setOnAction(event -> saveAction());
-        setIcon(menuItem, FontAwesomeIcon.SAVE);
-        menuButton.getItems().add(menuItem);
-
-        menuItem = new MenuItem("Save As ...");
-        menuItem.setOnAction(event -> saveAsAction());
-        menuItem.setAccelerator(new KeyCodeCombination(KeyCode.S, KeyCombination.ALT_DOWN, KeyCombination.CONTROL_DOWN));
-        menuButton.getItems().add(menuItem);
-
-        menuItem = new MenuItem("Save Selected Data ...");
-        menuItem.setOnAction(event -> saveSelectedAction());
-        menuButton.getItems().add(menuItem);
-        toolBar.getItems().add(menuButton);
-
-        menuButton = new MenuButton();
-        setIcon(menuButton, MaterialDesignIcon.EXPORT, "2em");
-        menuButton.setTooltip(new Tooltip("Export Conjugation to external format"));
-
-        menuItem = new MenuItem();
-        setIcon(menuItem, FontAwesomeIcon.FILE_WORD_ALT);
-        menuItem.setAccelerator(new KeyCodeCombination(KeyCode.W, KeyCombination.CONTROL_DOWN, KeyCombination.ALT_DOWN));
-        menuItem.setOnAction(event -> saveAction(SaveMode.EXPORT_TO_WORD));
-        menuButton.getItems().add(menuItem);
-        toolBar.getItems().add(menuButton);
-
-        toolBar.getItems().add(new Separator());
-        toolBar.getItems().add(createButton("Add new Row", ADD_BOX, event -> addNewRowAction()));
-        toolBar.getItems().add(createButton("Duplicate Selected Row(s)", CLONE, event -> duplicateRowAction()));
-        toolBar.getItems().add(createButton("Remove Selected Row", REMOVE, event -> removeRowAction()));
-        toolBar.getItems().add(new Separator());
-        toolBar.getItems().add(createButton("View / Edit Chart Configuration", SETTINGS_APPLICATIONS, event -> updateChartConfiguration()));
-
-        return toolBar;
-    }
-
-    private void addNewRowAction() {
+    void addNewRowAction() {
         TableView<TableModel> tableView = getCurrentTable();
         if (tableView != null) {
             ObservableList<TableModel> items = tableView.getItems();
@@ -310,7 +227,7 @@ class MorphologicalEnginePane extends BorderPane {
         }
     }
 
-    private void duplicateRowAction() {
+    void duplicateRowAction() {
         TableView<TableModel> currentTable = getCurrentTable();
         if (currentTable != null) {
             ObservableList<TableModel> items = currentTable.getItems();
@@ -327,7 +244,7 @@ class MorphologicalEnginePane extends BorderPane {
         } // end of if "currentTable != null"
     }
 
-    private void removeRowAction() {
+    void removeRowAction() {
         TableView<TableModel> currentTable = getCurrentTable();
         if (currentTable != null) {
             ObservableList<TableModel> items = currentTable.getItems();
@@ -343,7 +260,7 @@ class MorphologicalEnginePane extends BorderPane {
         }
     }
 
-    private void updateChartConfiguration() {
+    void updateChartConfiguration() {
         final TabInfo tabInfo = getTabUserData();
         if (tabInfo != null) {
             chartConfigurationDialog.setChartConfiguration(tabInfo.getChartConfiguration());
@@ -358,7 +275,7 @@ class MorphologicalEnginePane extends BorderPane {
      *
      * @see MorphologicalEnginePane#openAction(boolean)
      */
-    private void newAction() {
+    void newAction() {
         openAction(false);
     }
 
@@ -367,7 +284,7 @@ class MorphologicalEnginePane extends BorderPane {
      *
      * @see MorphologicalEnginePane#openAction(boolean)
      */
-    private void openAction() {
+    void openAction() {
         openAction(true);
     }
 
@@ -415,16 +332,31 @@ class MorphologicalEnginePane extends BorderPane {
         service.start();
     }
 
-    private void saveAction() {
+    void saveAction() {
         saveAction(SaveMode.SAVE);
     }
 
-    private void saveAsAction() {
+    void saveAsAction() {
         saveAction(SaveMode.SAVE_AS);
     }
 
-    private void saveSelectedAction() {
+    void saveSelectedAction() {
         saveAction(SaveMode.SAVE_SELECTED);
+    }
+
+    void exportToWordAction() {
+        saveAction(SaveMode.EXPORT_TO_WORD);
+    }
+
+    void closeAction() {
+        final Tab currentTab = getCurrentTab();
+        if (currentTab != null) {
+            //TODO:
+        }
+    }
+
+    void exitAction() {
+        Platform.exit();
     }
 
     private void saveAction(SaveMode saveMode) {
