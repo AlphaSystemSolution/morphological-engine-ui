@@ -383,6 +383,10 @@ class MorphologicalEnginePane extends BorderPane {
             } else {
                 currentItems.addAll(items);
             }
+            if(currentItems.isEmpty()){
+                changeToDefaultCursor();
+                return;
+            }
             try {
                 File sarfxFile = tabInfo.getSarfxFile();
                 ConjugationTemplate conjugationTemplate = getConjugationTemplate(currentItems,
