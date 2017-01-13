@@ -6,7 +6,11 @@ import com.alphasystem.app.morphologicalengine.conjugation.model.MorphologicalCh
 import com.alphasystem.app.morphologicalengine.docx.MorphologicalChartEngine;
 import com.alphasystem.app.morphologicalengine.ui.util.MorphologicalEnginePreferences;
 import com.alphasystem.app.morphologicalengine.util.TemplateReader;
-import com.alphasystem.app.sarfengine.ui.control.*;
+import com.alphasystem.app.sarfengine.ui.control.ChartConfigurationDialog;
+import com.alphasystem.app.sarfengine.ui.control.FileSelectionDialog;
+import com.alphasystem.app.sarfengine.ui.control.MorphologicalChartViewerControl;
+import com.alphasystem.app.sarfengine.ui.control.RootLettersTableCell;
+import com.alphasystem.app.sarfengine.ui.control.VerbalNounTableCell;
 import com.alphasystem.app.sarfengine.ui.control.model.TabInfo;
 import com.alphasystem.app.sarfengine.ui.control.model.TableModel;
 import com.alphasystem.arabic.model.NamedTemplate;
@@ -20,6 +24,8 @@ import com.sun.javafx.scene.control.behavior.TabPaneBehavior;
 import com.sun.javafx.scene.control.skin.TabPaneSkin;
 import javafx.application.Platform;
 import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Service;
@@ -32,15 +38,28 @@ import javafx.scene.Cursor;
 import javafx.scene.Group;
 import javafx.scene.Node;
 import javafx.scene.Scene;
-import javafx.scene.control.*;
+import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonBar.ButtonData;
+import javafx.scene.control.ButtonType;
+import javafx.scene.control.ComboBox;
 import javafx.scene.control.ScrollPane;
+import javafx.scene.control.Tab;
+import javafx.scene.control.TabPane;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableView;
 import javafx.scene.control.cell.CheckBoxTableCell;
 import javafx.scene.control.cell.ComboBoxTableCell;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.control.cell.TextFieldTableCell;
-import javafx.scene.layout.*;
+import javafx.scene.layout.Background;
+import javafx.scene.layout.BackgroundFill;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.CornerRadii;
+import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
+import javafx.scene.text.Font;
+import javafx.scene.text.FontPosture;
+import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextFlow;
 import javafx.stage.Screen;
@@ -48,14 +67,16 @@ import javafx.stage.Stage;
 import javafx.stage.Window;
 import javafx.util.Callback;
 
-import java.awt.*;
+import java.awt.Desktop;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Optional;
 
-import static com.alphasystem.app.sarfengine.ui.Global.*;
+import static com.alphasystem.app.sarfengine.ui.Global.FILE_CHOOSER;
+import static com.alphasystem.app.sarfengine.ui.Global.createSpaceLabel;
+import static com.alphasystem.app.sarfengine.ui.Global.roundTo100;
 import static com.alphasystem.arabic.ui.ComboBoxHelper.createComboBox;
 import static java.lang.Math.max;
 import static java.lang.String.format;
@@ -64,7 +85,9 @@ import static javafx.collections.FXCollections.observableArrayList;
 import static javafx.geometry.NodeOrientation.RIGHT_TO_LEFT;
 import static javafx.scene.control.Alert.AlertType.CONFIRMATION;
 import static javafx.scene.control.Alert.AlertType.ERROR;
-import static javafx.scene.control.ButtonType.*;
+import static javafx.scene.control.ButtonType.CANCEL;
+import static javafx.scene.control.ButtonType.NO;
+import static javafx.scene.control.ButtonType.YES;
 import static javafx.scene.control.ContentDisplay.GRAPHIC_ONLY;
 import static javafx.scene.control.ScrollPane.ScrollBarPolicy.AS_NEEDED;
 import static javafx.scene.control.SelectionMode.SINGLE;
@@ -90,6 +113,7 @@ class MorphologicalEnginePane extends BorderPane {
     private final Stage chartStage;
     private final TemplateReader templateReader = TemplateReader.getInstance();
     private final MorphologicalEnginePreferences preferences;
+    private final ObjectProperty<Font> arabicFontProperty = new SimpleObjectProperty<>(this, "font");
 
     MorphologicalEnginePane(File initialFile) {
         preferences = GenericPreferences.getInstance(MorphologicalEnginePreferences.class);
@@ -149,6 +173,7 @@ class MorphologicalEnginePane extends BorderPane {
     }
 
     private Tab createTab(File file, ConjugationTemplate template) {
+        arabicFontProperty.setValue(getArabicFont());
         Tab tab = new Tab(getTabTitle(file), createTable(template));
         TabInfo value = new TabInfo();
         if (file != null) {
@@ -267,9 +292,18 @@ class MorphologicalEnginePane extends BorderPane {
         if (tabInfo != null) {
             chartConfigurationDialog.setChartConfiguration(tabInfo.getChartConfiguration());
             Optional<ChartConfiguration> result = chartConfigurationDialog.showAndWait();
-            result.ifPresent(tabInfo::setChartConfiguration);
+            result.ifPresent(chartConfiguration -> updateChartConfiguration(tabInfo, chartConfiguration));
         }
+    }
 
+    private void updateChartConfiguration(final TabInfo tabInfo, final ChartConfiguration chartConfiguration) {
+        tabInfo.setChartConfiguration(chartConfiguration);
+        arabicFontProperty.setValue(getArabicFont());
+    }
+
+    private Font getArabicFont() {
+        return Font.font(preferences.getArabicFontName(), FontWeight.BLACK, FontPosture.REGULAR,
+                preferences.getArabicFontSize());
     }
 
     /**
@@ -355,7 +389,7 @@ class MorphologicalEnginePane extends BorderPane {
         if (currentTab != null) {
             final TabPaneSkin skin = (TabPaneSkin) tabPane.getSkin();
             final TabPaneBehavior behavior = skin.getBehavior();
-            if(behavior.canCloseTab(currentTab)){
+            if (behavior.canCloseTab(currentTab)) {
                 behavior.closeTab(currentTab);
             }
         }
@@ -389,7 +423,7 @@ class MorphologicalEnginePane extends BorderPane {
             } else {
                 currentItems.addAll(items);
             }
-            if(currentItems.isEmpty()){
+            if (currentItems.isEmpty()) {
                 changeToDefaultCursor();
                 return;
             }
@@ -551,7 +585,8 @@ class MorphologicalEnginePane extends BorderPane {
         rootLettersColumn.setPrefWidth(largeColumnWidth);
         rootLettersColumn.setEditable(true);
         rootLettersColumn.setCellValueFactory(new PropertyValueFactory<>("rootLetters"));
-        rootLettersColumn.setCellFactory(RootLettersTableCell::new);
+        //rootLettersTableCell.fontProperty().bind(arabicFontProperty);
+        rootLettersColumn.setCellFactory(param -> new RootLettersTableCell(param, arabicFontProperty));
         rootLettersColumn.setOnEditCommit(event -> {
             makeDirty(true);
             TableView<TableModel> table = event.getTableView();

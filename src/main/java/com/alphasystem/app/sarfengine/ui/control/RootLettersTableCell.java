@@ -4,11 +4,13 @@ import com.alphasystem.app.sarfengine.ui.control.model.TableModel;
 import com.alphasystem.arabic.model.ArabicLetterType;
 import com.alphasystem.arabic.ui.RootLettersPickerKeyBoard;
 import com.alphasystem.morphologicalanalysis.morphology.model.RootLetters;
+import javafx.beans.property.ObjectProperty;
 import javafx.geometry.Bounds;
 import javafx.geometry.Pos;
 import javafx.scene.Group;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
+import javafx.scene.text.Font;
 import javafx.scene.text.TextFlow;
 import javafx.stage.Popup;
 
@@ -25,13 +27,18 @@ public class RootLettersTableCell extends TableCell<TableModel, RootLetters> {
     private final Popup popup;
     private final RootLettersPickerKeyBoard keyBoard;
 
-    public RootLettersTableCell(@SuppressWarnings({"unused"}) TableColumn<TableModel, RootLetters> column) {
+    public RootLettersTableCell(@SuppressWarnings({"unused"}) TableColumn<TableModel, RootLetters> column, ObjectProperty<Font> font) {
         setContentDisplay(GRAPHIC_ONLY);
         setAlignment(Pos.CENTER);
         setNodeOrientation(RIGHT_TO_LEFT);
 
         popup = new Popup();
         keyBoard = new RootLettersPickerKeyBoard();
+        keyBoard.setFont(font.get());
+        keyBoard.setSelectedLabelWidth(48);
+        keyBoard.setSelectedLabelHeight(48);
+        fontProperty().bind(font);
+        keyBoard.fontProperty().bind(fontProperty());
 
         popup.getContent().add(keyBoard);
         popup.setAutoHide(true);
@@ -40,10 +47,7 @@ public class RootLettersTableCell extends TableCell<TableModel, RootLetters> {
     }
 
     private void commitEdit() {
-        ArabicLetterType[] arabicLetters = keyBoard.getRootLetters();
-        RootLetters rootLetters = new RootLetters().withFirstRadical(arabicLetters[0]).withSecondRadical(arabicLetters[1])
-                .withThirdRadical(arabicLetters[2]).withFourthRadical(arabicLetters[3]);
-        commitEdit(rootLetters);
+        commitEdit(keyBoard.getRootLetters());
     }
 
     @Override
@@ -74,4 +78,5 @@ public class RootLettersTableCell extends TableCell<TableModel, RootLetters> {
         }
         setGraphic(label);
     }
+
 }
