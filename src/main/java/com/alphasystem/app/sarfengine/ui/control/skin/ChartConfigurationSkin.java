@@ -197,7 +197,7 @@ public class ChartConfigurationSkin extends SkinBase<ChartConfigurationView> {
         arabicFontSizeComboBox.setValue(view.getArabicFontSize());
         label.setLabelFor(arabicFontSizeComboBox);
         arabicFontSizeComboBox.valueProperty().addListener((observable, oldValue, newValue) -> view.setArabicFontSize(newValue));
-        view.translationFontSizeProperty().addListener((observable, oldValue, newValue) -> arabicFontSizeComboBox.setValue((Long) newValue));
+        view.arabicFontSizeProperty().addListener((observable, oldValue, newValue) -> arabicFontSizeComboBox.setValue((Long) newValue));
         gridPane.add(arabicFontSizeComboBox, 1, 2);
 
         label = new Label("Translation Font Size:");

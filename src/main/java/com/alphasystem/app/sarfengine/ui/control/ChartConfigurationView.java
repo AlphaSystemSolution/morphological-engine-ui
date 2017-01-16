@@ -224,7 +224,7 @@ public class ChartConfigurationView extends Control {
         return arabicFontSize.get();
     }
 
-    private LongProperty arabicFontSizeProperty() {
+    public LongProperty arabicFontSizeProperty() {
         return arabicFontSize;
     }
 
