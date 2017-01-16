@@ -2,10 +2,16 @@ package com.alphasystem.app.sarfengine.ui.control.skin;
 
 import com.alphasystem.app.sarfengine.ui.control.ChartConfigurationView;
 import com.alphasystem.fx.ui.util.FontSizeStringConverter;
+import com.alphasystem.morphologicalanalysis.morphology.model.support.PageOrientation;
 import com.alphasystem.morphologicalanalysis.morphology.model.support.SortDirection;
 import com.alphasystem.morphologicalanalysis.morphology.model.support.SortDirective;
 import javafx.geometry.Insets;
-import javafx.scene.control.*;
+import javafx.scene.control.CheckBox;
+import javafx.scene.control.ComboBox;
+import javafx.scene.control.Label;
+import javafx.scene.control.SkinBase;
+import javafx.scene.control.Tab;
+import javafx.scene.control.TabPane;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.text.Font;
@@ -223,6 +229,16 @@ public class ChartConfigurationSkin extends SkinBase<ChartConfigurationView> {
         headingFontSizeComboBox.valueProperty().addListener((observable, oldValue, newValue) -> view.setHeadingFontSize(newValue));
         view.headingFontSizeProperty().addListener((observable, oldValue, newValue) -> headingFontSizeComboBox.setValue((Long) newValue));
         gridPane.add(headingFontSizeComboBox, 1, 4);
+
+        label = new Label("Page Orientation:");
+        gridPane.add(label, 0, 5);
+        ComboBox<PageOrientation> pageOrientationComboBox = new ComboBox<>();
+        pageOrientationComboBox.getItems().addAll(PageOrientation.values());
+        pageOrientationComboBox.setValue(view.getPageOrientation());
+        label.setLabelFor(pageOrientationComboBox);
+        pageOrientationComboBox.valueProperty().addListener((observable, oldValue, newValue) -> view.setPageOrientation(newValue));
+        view.pageOrientationProperty().addListener((observable, oldValue, newValue) -> pageOrientationComboBox.setValue(newValue));
+        gridPane.add(pageOrientationComboBox, 1, 5);
 
         gridPane.getStyleClass().add("view");
         BorderPane borderPane = new BorderPane();

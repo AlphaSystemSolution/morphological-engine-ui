@@ -3,10 +3,19 @@ package com.alphasystem.app.sarfengine.ui.control;
 import com.alphasystem.app.morphologicalengine.ui.util.MorphologicalEnginePreferences;
 import com.alphasystem.app.sarfengine.ui.control.skin.ChartConfigurationSkin;
 import com.alphasystem.morphologicalanalysis.morphology.model.ChartConfiguration;
+import com.alphasystem.morphologicalanalysis.morphology.model.PageOption;
+import com.alphasystem.morphologicalanalysis.morphology.model.support.PageOrientation;
 import com.alphasystem.morphologicalanalysis.morphology.model.support.SortDirection;
 import com.alphasystem.morphologicalanalysis.morphology.model.support.SortDirective;
 import com.alphasystem.util.GenericPreferences;
-import javafx.beans.property.*;
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.LongProperty;
+import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.property.SimpleLongProperty;
+import javafx.beans.property.SimpleObjectProperty;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
 import javafx.scene.control.Control;
 import javafx.scene.control.Skin;
 
@@ -37,6 +46,7 @@ public class ChartConfigurationView extends Control {
     private final LongProperty translationUiFontSize = new SimpleLongProperty(this, "translationUiFontSize");
     private final LongProperty headingFontSize = new SimpleLongProperty(this, "headingFontSize");
     private final LongProperty headingUiFontSize = new SimpleLongProperty(this, "headingUiFontSize");
+    private final ObjectProperty<PageOrientation> pageOrientation = new SimpleObjectProperty<>(this, "pageOrientation", PageOrientation.PORTRAIT);
 
     public ChartConfigurationView() {
         chartConfiguration.addListener((o, ov, nv) -> {
@@ -73,6 +83,9 @@ public class ChartConfigurationView extends Control {
             size = (size <= 0) ? preferences.getArabicHeadingFontSize() : size;
             setHeadingFontSize(size);
             setHeadingUiFontSize(preferences.getArabicHeadingFontSize());
+
+            final PageOption pageOption = nv.getPageOption();
+            setPageOrientation(pageOption.getOrientation());
         });
 
         omitAbbreviatedConjugationProperty().addListener((o, ov, nv) -> getChartConfiguration().setOmitAbbreviatedConjugation(nv));
@@ -93,6 +106,7 @@ public class ChartConfigurationView extends Control {
         translationUiFontSizeProperty().addListener((o, ov, nv) -> preferences.setEnglishFontSize((Long) nv));
         headingFontSizeProperty().addListener((o, ov, nv) -> getChartConfiguration().setHeadingFontSize((Long) nv));
         headingUiFontSizeProperty().addListener((o, ov, nv) -> preferences.setArabicHeadingFontSize((Long) nv));
+        pageOrientationProperty().addListener((o, ov, nv) -> getChartConfiguration().getPageOption().setOrientation(nv));
 
         setChartConfiguration(null);
         setMinWidth(600);
@@ -290,5 +304,17 @@ public class ChartConfigurationView extends Control {
 
     public final void setHeadingUiFontSize(long headingUiFontSize) {
         this.headingUiFontSize.set(headingUiFontSize);
+    }
+
+    public final PageOrientation getPageOrientation() {
+        return pageOrientation.get();
+    }
+
+    public final ObjectProperty<PageOrientation> pageOrientationProperty() {
+        return pageOrientation;
+    }
+
+    public final void setPageOrientation(PageOrientation pageOrientation) {
+        this.pageOrientation.set((pageOrientation == null) ? PageOrientation.PORTRAIT : pageOrientation);
     }
 }
