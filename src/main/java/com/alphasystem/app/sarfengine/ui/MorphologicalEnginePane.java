@@ -117,15 +117,15 @@ class MorphologicalEnginePane extends BorderPane {
 
     MorphologicalEnginePane(File initialFile) {
         preferences = GenericPreferences.getInstance(MorphologicalEnginePreferences.class);
+        chartConfigurationDialog = new ChartConfigurationDialog();
+        fileSelectionDialog = new FileSelectionDialog(new TabInfo());
+        FILE_CHOOSER.setInitialDirectory(preferences.getInitialDirectory());
+        morphologicalChartViewer = new MorphologicalChartViewerControl();
         tabPane = new TabPane();
         tabPane.setTabClosingPolicy(SELECTED_TAB);
         tabPane.setBackground(BACKGROUND);
         openAction(initialFile);
 
-        chartConfigurationDialog = new ChartConfigurationDialog();
-        fileSelectionDialog = new FileSelectionDialog(new TabInfo());
-        FILE_CHOOSER.setInitialDirectory(preferences.getInitialDirectory());
-        morphologicalChartViewer = new MorphologicalChartViewerControl();
         chartStage = new Stage();
         initViewerStage();
 
@@ -175,7 +175,8 @@ class MorphologicalEnginePane extends BorderPane {
     private Tab createTab(File file, ConjugationTemplate template) {
         arabicFontProperty.setValue(getArabicFont());
         Tab tab = new Tab(getTabTitle(file), createTable(template));
-        TabInfo value = new TabInfo();
+        TabInfo tabInfo = new TabInfo();
+        tabInfo.setChartConfiguration(template.getChartConfiguration());
         if (file != null) {
             final File parentFile = file.getParentFile();
             FILE_CHOOSER.setInitialDirectory(parentFile);
@@ -185,13 +186,13 @@ class MorphologicalEnginePane extends BorderPane {
             } catch (BusinessException e) {
                 e.printStackTrace();
             }
-            value.setSarfxFile(file);
-            value.setDocxFile(TemplateReader.getDocxFile(file));
+            tabInfo.setSarfxFile(file);
+            tabInfo.setDocxFile(TemplateReader.getDocxFile(file));
         }
-        tab.setUserData(value);
+        tab.setUserData(tabInfo);
         tab.setOnCloseRequest(event -> {
-            TabInfo tabInfo = getTabUserData();
-            if (tabInfo != null && tabInfo.getDirty()) {
+            TabInfo currentTabInfo = getTabUserData();
+            if (currentTabInfo != null && currentTabInfo.getDirty()) {
                 Alert alert = new Alert(CONFIRMATION);
                 alert.setContentText("Do you want to save data before closing?");
                 alert.getButtonTypes().setAll(YES, NO, CANCEL);
@@ -211,16 +212,6 @@ class MorphologicalEnginePane extends BorderPane {
     }
 
     private ScrollPane createTable(ConjugationTemplate conjugationTemplate) {
-        if (conjugationTemplate == null) {
-            ChartConfiguration chartConfiguration = new ChartConfiguration();
-            chartConfiguration.setArabicFontFamily(preferences.getArabicFontName());
-            chartConfiguration.setTranslationFontFamily(preferences.getEnglishFontName());
-            chartConfiguration.setArabicFontSize(preferences.getArabicFontSize());
-            chartConfiguration.setTranslationFontSize(preferences.getEnglishFontSize());
-            chartConfiguration.setHeadingFontSize(preferences.getArabicHeadingFontSize());
-            conjugationTemplate = new ConjugationTemplate();
-            conjugationTemplate.setChartConfiguration(chartConfiguration);
-        }
         ObservableList<TableModel> tableModels = observableArrayList();
         List<ConjugationData> dataList = conjugationTemplate.getData();
         if (dataList.isEmpty()) {
@@ -824,6 +815,16 @@ class MorphologicalEnginePane extends BorderPane {
                 protected Tab call() throws Exception {
                     changeToWaitCursor();
                     ConjugationTemplate template = file == null ? null : templateReader.readFile(file);
+                    if (template == null) {
+                        ChartConfiguration chartConfiguration = new ChartConfiguration();
+                        chartConfiguration.setArabicFontFamily(preferences.getArabicFontName());
+                        chartConfiguration.setTranslationFontFamily(preferences.getEnglishFontName());
+                        chartConfiguration.setArabicFontSize(preferences.getArabicFontSize());
+                        chartConfiguration.setTranslationFontSize(preferences.getEnglishFontSize());
+                        chartConfiguration.setHeadingFontSize(preferences.getArabicHeadingFontSize());
+                        template = new ConjugationTemplate();
+                        template.setChartConfiguration(chartConfiguration);
+                    }
                     return createTab(file, template);
                 } // end of method "call"
             }; // end of anonymous class "Task"
