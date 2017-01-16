@@ -142,7 +142,7 @@ class MorphologicalEnginePane extends BorderPane {
     private static double calculateTableHeight(int numOfRows) {
         double height = (numOfRows * ROW_SIZE) + ROW_SIZE;
         height = roundTo100(height);
-        return max(height, DEFAULT_MIN_HEIGHT);
+        return max(height, DEFAULT_MIN_HEIGHT) + 100;
     }
 
     private Tab getCurrentTab() {
@@ -251,6 +251,11 @@ class MorphologicalEnginePane extends BorderPane {
             ObservableList<TableModel> items = tableView.getItems();
             items.add(new TableModel());
             tableView.setPrefHeight(calculateTableHeight(items.size()));
+            Platform.runLater(() -> {
+                tableView.requestFocus();
+                tableView.getSelectionModel().selectLast();
+                tableView.getFocusModel().focus(tableView.getItems().size() - 1);
+            });
         }
     }
 
@@ -619,6 +624,7 @@ class MorphologicalEnginePane extends BorderPane {
                 labelText = new Text();
                 labelText.setTextAlignment(CENTER);
                 labelText.setFont(preferences.getEnglishFont());
+                comboBox.setVisibleRowCount(15);
 
                 comboBox.getSelectionModel().selectedItemProperty().addListener((o, ov, nv) -> commitEdit(nv));
             }
