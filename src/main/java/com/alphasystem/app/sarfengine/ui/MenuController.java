@@ -112,8 +112,13 @@ final class MenuController {
     }
 
     private MenuItem createExportToWordMenuItem() {
-        return createMenuItem(null, FontAwesomeIcon.FILE_WORD_ALT, "1.5em",
+        return createMenuItem("Export to Word", FontAwesomeIcon.FILE_WORD_ALT, "1.5em",
                 new KeyCodeCombination(KeyCode.W, SHORTCUT_DOWN, ALT_DOWN), event -> pane.exportToWordAction());
+    }
+
+    private MenuItem createExportSelectedToWordMenuItem() {
+        return createMenuItem("Export selected to Word", FontAwesomeIcon.FILE_WORD_ALT, "1.5em", null,
+                event -> pane.exportSelectedToWordAction());
     }
 
     private MenuItem createAddRowMenuItem() {
@@ -147,7 +152,7 @@ final class MenuController {
         MenuButton menuButton = new MenuButton();
         setIcon(menuButton, MaterialDesignIcon.EXPORT, "2em");
         menuButton.setTooltip(new Tooltip("Export Conjugation to external format"));
-        menuButton.getItems().add(createExportToWordMenuItem());
+        menuButton.getItems().addAll(createExportToWordMenuItem(), createExportSelectedToWordMenuItem());
         return menuButton;
     }
 

@@ -66,10 +66,13 @@ import javafx.stage.Screen;
 import javafx.stage.Stage;
 import javafx.stage.Window;
 import javafx.util.Callback;
+import org.docx4j.openpackaging.exceptions.Docx4JException;
 
 import java.awt.Desktop;
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Optional;
@@ -380,6 +383,10 @@ class MorphologicalEnginePane extends BorderPane {
         saveAction(SaveMode.EXPORT_TO_WORD);
     }
 
+    void exportSelectedToWordAction() {
+        saveAction(SaveMode.EXPORT_SELECTED_TO_WORD);
+    }
+
     void closeAction() {
         final Tab currentTab = getCurrentTab();
         if (currentTab != null) {
@@ -410,7 +417,7 @@ class MorphologicalEnginePane extends BorderPane {
             TableView<TableModel> tableView = getCurrentTable();
             ObservableList<TableModel> items = tableView.getItems();
             final ObservableList<TableModel> currentItems = observableArrayList();
-            if (SaveMode.SAVE_SELECTED.equals(saveMode)) {
+            if (SaveMode.SAVE_SELECTED.equals(saveMode) || SaveMode.EXPORT_SELECTED_TO_WORD.equals(saveMode)) {
                 items.forEach(tableModel -> {
                     if (tableModel.isChecked()) {
                         currentItems.add(tableModel);
@@ -423,26 +430,48 @@ class MorphologicalEnginePane extends BorderPane {
                 changeToDefaultCursor();
                 return;
             }
-            try {
-                File sarfxFile = tabInfo.getSarfxFile();
-                ConjugationTemplate conjugationTemplate = getConjugationTemplate(currentItems,
-                        tabInfo.getChartConfiguration());
-                templateReader.saveFile(sarfxFile, conjugationTemplate);
-                if (SaveMode.EXPORT_TO_WORD.equals(saveMode)) {
-                    saveAsDocx(tabInfo, conjugationTemplate);
-                }
+            ConjugationTemplate conjugationTemplate = getConjugationTemplate(currentItems, tabInfo.getChartConfiguration());
 
-                Tab currentTab = getCurrentTab();
-                currentTab.setText(TemplateReader.getFileNameNoExtension(sarfxFile));
-                if (SaveMode.SAVE_SELECTED.equals(saveMode)) {
-                    tableView.getItems().clear();
-                    tableView.getItems().addAll(currentItems);
+            if (SaveMode.EXPORT_SELECTED_TO_WORD.equals(saveMode)) {
+                conjugationTemplate.getChartConfiguration().setOmitToc(true);
+                Path tempPath = null;
+                try {
+                    tempPath = Files.createTempFile("", ".docx");
+                    tempPath.toFile().deleteOnExit();
+                } catch (IOException e) {
+                    // ignore
                 }
-            } catch (ApplicationException e) {
-                changeToDefaultCursor();
-                e.printStackTrace();
-                showError(e);
+                if (tempPath != null) {
+                    MorphologicalChartEngine engine = new MorphologicalChartEngine(conjugationTemplate);
+                    try {
+                        engine.createDocument(tempPath);
+                        currentItems.forEach(tableModel -> tableModel.setChecked(false));
+                        Desktop.getDesktop().open(tempPath.toFile());
+                    } catch (Docx4JException | IOException e) {
+                        // ignore
+                    }
+                }
+            } else {
+                try {
+                    File sarfxFile = tabInfo.getSarfxFile();
+                    templateReader.saveFile(sarfxFile, conjugationTemplate);
+                    if (SaveMode.EXPORT_TO_WORD.equals(saveMode)) {
+                        saveAsDocx(tabInfo, conjugationTemplate);
+                    }
+
+                    Tab currentTab = getCurrentTab();
+                    currentTab.setText(TemplateReader.getFileNameNoExtension(sarfxFile));
+                    if (SaveMode.SAVE_SELECTED.equals(saveMode)) {
+                        tableView.getItems().clear();
+                        tableView.getItems().addAll(currentItems);
+                    }
+                } catch (ApplicationException e) {
+                    changeToDefaultCursor();
+                    e.printStackTrace();
+                    showError(e);
+                }
             }
+
             changeToDefaultCursor();
         };
     }
@@ -740,7 +769,6 @@ class MorphologicalEnginePane extends BorderPane {
     private void updateViewer(TableModel tableModel) {
         ConjugationTemplate conjugationTemplate = new ConjugationTemplate();
         conjugationTemplate.getData().add(tableModel.getConjugationData());
-
         MorphologicalChartEngine engine = new MorphologicalChartEngine(conjugationTemplate);
         final MorphologicalChart morphologicalChart = engine.createMorphologicalCharts().get(0);
         morphologicalChartViewer.setMorphologicalChart(null);
@@ -797,7 +825,7 @@ class MorphologicalEnginePane extends BorderPane {
     }
 
     private enum SaveMode {
-        SAVE, SAVE_AS, SAVE_SELECTED, EXPORT_TO_WORD
+        SAVE, SAVE_AS, SAVE_SELECTED, EXPORT_TO_WORD, EXPORT_SELECTED_TO_WORD
     }
 
     private class FileOpenService extends Service<Tab> {
