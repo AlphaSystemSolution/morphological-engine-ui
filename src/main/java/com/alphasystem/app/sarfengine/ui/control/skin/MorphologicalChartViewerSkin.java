@@ -1,9 +1,9 @@
 package com.alphasystem.app.sarfengine.ui.control.skin;
 
 import com.alphasystem.app.morphologicalengine.conjugation.model.MorphologicalChart;
-import com.alphasystem.app.morphologicalengine.conjugation.model.RootLetters;
 import com.alphasystem.app.morphologicalengine.ui.MorphologicalChartControl;
 import com.alphasystem.app.sarfengine.ui.control.MorphologicalChartViewerControl;
+import com.alphasystem.morphologicalanalysis.morphology.model.RootLetters;
 import com.alphasystem.arabic.model.ArabicLetterType;
 import com.alphasystem.fx.ui.Browser;
 import com.alphasystem.fx.ui.util.UiUtilities;
@@ -12,6 +12,7 @@ import javafx.scene.control.SkinBase;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.web.WebEngine;
 
 import static java.lang.String.format;
 
@@ -20,7 +21,8 @@ import static java.lang.String.format;
  */
 public class MorphologicalChartViewerSkin extends SkinBase<MorphologicalChartViewerControl> {
 
-    private static final String MAWRID_READER_URL = "http://ejtaal.net/aa/index.html#bwq=";
+    private static final String MAWRID_READER_URL_PREFIX = System.getProperty("mawrid-reader.url", "http://ejtaal.net/");
+    private static final String MAWRID_READER_URL = MAWRID_READER_URL_PREFIX + "aa/index.html#bwq=";
 
     /**
      * Constructor for all SkinBase instances.
@@ -85,8 +87,9 @@ public class MorphologicalChartViewerSkin extends SkinBase<MorphologicalChartVie
                     rootLetters.getSecondRadical().toCode(), rootLetters.getThirdRadical().toCode(), fr);
 
             String url = format("%s%s", MAWRID_READER_URL, searchString);
-            // System.out.println("Before: " + url);
-            browser.getWebEngine().getLoadWorker().stateProperty().addListener((observable, oldValue, newValue) -> {
+            System.out.println("Before: " + url);
+            final WebEngine webEngine = browser.getWebEngine();
+            webEngine.getLoadWorker().stateProperty().addListener((observable, oldValue, newValue) -> {
                 if (Worker.State.FAILED.equals(newValue)) {
                     dictionaryTab.setDisable(true);
                 }
