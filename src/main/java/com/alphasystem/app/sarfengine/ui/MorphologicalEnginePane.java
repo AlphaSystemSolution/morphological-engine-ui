@@ -19,6 +19,7 @@ import com.alphasystem.morphologicalanalysis.morphology.model.ConjugationData;
 import com.alphasystem.morphologicalanalysis.morphology.model.ConjugationTemplate;
 import com.alphasystem.morphologicalanalysis.morphology.model.RootLetters;
 import com.alphasystem.morphologicalanalysis.morphology.model.support.VerbalNoun;
+import com.alphasystem.util.AppUtil;
 import com.alphasystem.util.GenericPreferences;
 import com.sun.javafx.scene.control.behavior.TabPaneBehavior;
 import com.sun.javafx.scene.control.skin.TabPaneSkin;
@@ -341,7 +342,12 @@ class MorphologicalEnginePane extends BorderPane {
     private void openAction(final boolean showDialog) {
         File file = null;
         if (showDialog) {
-            file = FILE_CHOOSER.showOpenDialog(getScene().getWindow());
+            try {
+                file = FILE_CHOOSER.showOpenDialog(getScene().getWindow());
+            } catch (IllegalArgumentException e) {
+                FILE_CHOOSER.setInitialDirectory(AppUtil.USER_HOME_DIR);
+                file = FILE_CHOOSER.showOpenDialog(getScene().getWindow());
+            }
             if (file == null) {
                 // use might have cancel the dialog
                 return;
