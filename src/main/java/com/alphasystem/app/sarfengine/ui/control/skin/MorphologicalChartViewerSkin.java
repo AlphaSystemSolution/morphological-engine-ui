@@ -3,8 +3,6 @@ package com.alphasystem.app.sarfengine.ui.control.skin;
 import com.alphasystem.app.morphologicalengine.conjugation.model.MorphologicalChart;
 import com.alphasystem.app.morphologicalengine.ui.MorphologicalChartControl;
 import com.alphasystem.app.sarfengine.ui.control.MorphologicalChartViewerControl;
-import com.alphasystem.morphologicalanalysis.morphology.model.RootLetters;
-import com.alphasystem.arabic.model.ArabicLetterType;
 import com.alphasystem.fx.ui.Browser;
 import com.alphasystem.fx.ui.util.UiUtilities;
 import javafx.concurrent.Worker;
@@ -80,14 +78,9 @@ public class MorphologicalChartViewerSkin extends SkinBase<MorphologicalChartVie
             morphologicalChartControl.setMorphologicalChart(morphologicalChart);
             morphologicalChartTab.setDisable(false);
 
-            final RootLetters rootLetters = morphologicalChart.getRootLetters();
-            final ArabicLetterType fourthRadical = rootLetters.getFourthRadical();
-            String fr = format("%s", (fourthRadical == null) ? "" : fourthRadical.toCode());
-            String searchString = format("%s%s%s%s", rootLetters.getFirstRadical().toCode(),
-                    rootLetters.getSecondRadical().toCode(), rootLetters.getThirdRadical().toCode(), fr);
+            String searchString = morphologicalChart.getRootLetters().toMawridSearchString();
 
             String url = format("%s%s", MAWRID_READER_URL, searchString);
-            System.out.println("Before: " + url);
             final WebEngine webEngine = browser.getWebEngine();
             webEngine.getLoadWorker().stateProperty().addListener((observable, oldValue, newValue) -> {
                 if (Worker.State.FAILED.equals(newValue)) {
@@ -95,9 +88,6 @@ public class MorphologicalChartViewerSkin extends SkinBase<MorphologicalChartVie
                 }
                 // System.out.println(String.format("The state is %s", newValue));
             });
-//            browser.getWebEngine().locationProperty().addListener((observable, oldValue, newValue) -> {
-//                System.out.println("After " + newValue);
-//            });
             dictionaryTab.setDisable(false);
             browser.loadUrl(url);
         }
