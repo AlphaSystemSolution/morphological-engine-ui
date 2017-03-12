@@ -97,7 +97,6 @@ import static javafx.scene.control.ScrollPane.ScrollBarPolicy.AS_NEEDED;
 import static javafx.scene.control.SelectionMode.SINGLE;
 import static javafx.scene.control.TabPane.TabClosingPolicy.SELECTED_TAB;
 import static javafx.scene.text.TextAlignment.CENTER;
-import static javafx.stage.Screen.getPrimary;
 import static org.apache.commons.io.FilenameUtils.getBaseName;
 
 /**
@@ -223,7 +222,7 @@ class MorphologicalEnginePane extends BorderPane {
         }
         dataList.forEach(data -> tableModels.add(new TableModel(data)));
 
-        double boundsWidth = getPrimary().getVisualBounds().getWidth();
+        double boundsWidth = Screen.getPrimary().getVisualBounds().getWidth();
 
         TableView<TableModel> tableView = new TableView<>(tableModels);
         tableView.setBackground(BACKGROUND);
@@ -758,7 +757,7 @@ class MorphologicalEnginePane extends BorderPane {
                 final NamedTemplate template = tableModel.getTemplate();
                 if (rootLetters == null || template == null) {
                     Alert alert = new Alert(Alert.AlertType.INFORMATION);
-                    alert.setContentText("Both RootLetters and Form has to populated.");
+                    alert.setContentText("Both RootLetters and Form has to be populated.");
                     alert.show();
                     viewConjugationProperty.setValue(false);
                 } else {
